@@ -1,0 +1,804 @@
+@font-face
+{
+  font-family: "Noto Color Emoji";
+  font-style: normal;
+  font-weight: 400;
+  src: local('Noto Color Emoji'), local('NotoColorEmoji'), url('../fonts/NotoColorEmoji.ttf') format('truetype');
+}
+
+@font-face
+{
+  font-family: "Open Sans Emoji";
+  font-style: normal;
+  font-weight: 400;
+  src: local('Open Sans Emoji'), local('OpenSansEmoji'), url('../fonts/OpenSansEmoji.ttf') format('truetype');
+}
+
+.width100 {
+  width: 100% !important;
+}
+
+.puzzle-color-header {
+  height: 6px;
+  border-bottom: 0px;
+}
+
+.edit-puzzle-field {
+  border: 1px dotted #aaa;
+}
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.comma-list {
+  & > *::after { content: ", "; }
+  & > *:last-child::after { content:""; }
+}
+.bb-no-wrap {
+  white-space: nowrap;
+}
+
+.bb-abbrev-when-narrow::before {
+  content: attr(data-full);
+  @media (max-width: 767px)  {
+    content: attr(data-abbrev);
+  }
+}
+
+.border-radius(@radius: 5px) {
+  -webkit-border-radius: @radius;
+     -moz-border-radius: @radius;
+          border-radius: @radius;
+}
+
+@navbar-height: 48px;
+
+body {
+  background: url('/img/grid_noise.png');
+  background-attachment: fixed;
+  font-family: "Noto Sans", sans-serif, "Noto Color Emoji", "Open Sans Emoji";
+  // Override bootstrap
+  input, button, select, textarea {
+    font-family: "Noto Sans", sans-serif, "Noto Color Emoji", "Open Sans Emoji";
+  }
+}
+// For mobile devices which actually support native emojis:
+body.has-emojis {
+  font-family: "Noto Sans", sans-serif;
+  input, button, select, textarea {
+      font-family: "Noto Sans", sans-serif;
+  }
+}
+
+.navbar-inner {
+  display: flex;
+}
+
+#bb-blackboard {
+}
+
+.bb-menu-button {
+  position: fixed;
+  bottom: 0px;
+  left:0px;
+  z-index: 1030;
+}
+.bb-menu-drawer {
+  &.fade {
+    opacity: 1;
+  }
+  position: fixed;
+  top: 0px;
+  bottom: 0px;
+  overflow-y: auto;
+  background-color: white;
+  width: 256px;
+  left: -256px;
+  z-index: 1050;
+  transition: left 0.25s ease-in-out;
+  border-right: 1px solid black;
+  &.in {
+    left: 0px;
+  }
+  ul {
+    margin-left: 5px;
+    li {
+      display: block;
+      a {
+        display: block;
+        &.bb-wiki { text-align: center; }
+      }
+      /* Chevrons */
+      .fa-chevron-right {
+        float: right;
+        margin-top: 2px;
+        margin-right: -6px;
+        opacity: .25;
+      }
+    }
+  }
+}
+
+.bb-chat-messages {
+  padding-top: 40px; /* allow space for breadcrumbs in navbar */
+}
+.bb-puzzleround {
+  padding-right: 2px; padding-left: 2px;
+  .navbar { margin: 0 10px; }
+  table.bb-round-answers { width: auto; }
+  .bb-spreadsheet-frame {
+    width: 100%;
+    height: 500px;
+    border-top: 1px solid #ccc;
+  }
+  h2 {
+    color: #AAA;
+  }
+  td.wanted { font-style: italic; }
+  .answer > span:first-child {
+    /* Vertically align answer timestamps */
+    display: inline-block; min-width: 120px;
+  }
+  .answer > .backsolve {
+    font-family: "Noto Sans", sans-serif, "Noto Color Emoji", "Open Sans Emoji";
+    font-size: .65em;
+    text-transform: none;
+  }
+  .bb-addquip-btn {
+    float: right; margin-top: 4px; margin-right: 3px;
+  }
+  .bb-left-content, .bb-top-right-content {
+    background: rgba(255,255,255,0.85);
+    &.bb-status-stuck { background: #ffd333; }
+    &.bb-status-solved { background: #bcffa6; }
+    .boring & {
+      background: white;
+      .bb-status-stuck { background: #ffd333; }
+      .bb-status-solved { background: #4F4; }
+    }
+    .bb-mechanics-dropdown .btn {
+      font-size: 10.5px;
+      padding: 0 6px;
+    }
+  }
+}
+.bb-options-dropdown {
+  margin-left: 10px;
+  display: inline-block;
+}
+.bb-chat-messages {
+  margin-bottom: 26px; /* 41px navbar - 15px padding on #bb-body */
+}
+.bb-chat-callin, .bb-puzzleround {
+  .bb-summon-form {
+    .stuck-at, .stuck-need { width: auto; }
+    .label-stuck-other { display: block; }
+  }
+}
+
+#bb-body {
+  padding-top: @navbar-height;
+  padding-bottom: 15px;
+
+  @left-size: 85px;
+  @right-size: 45px;
+  @vert-padding: 4px;
+
+  .bb-buttonbar {
+    text-align: right;
+    padding-right: 5px;
+    .btn-group { text-align: left; }
+    .btn-toolbar { margin-top: 0; margin-bottom: 0; }
+    .tooltip-inner {
+      color: #000;
+      background-color: #eee;
+      border-color: black;
+      border-style: solid;
+      border-width: 0 1px 1px 1px;
+    }
+    .tooltip.bottom .tooltip-arrow {
+      border-bottom-color: #eee;
+    }
+    /* tweak to fix up moving buttons when tooltip appears */
+    .bb-protect { margin-right: -1px; }
+    .bb-unprotect { margin-left: 0; }
+  }
+  .bb-breadcrumbs .tooltip-inner { .bb-buttonbar .tooltip-inner; }
+  .bb-breadcrumbs .tooltip.bottom .tooltip-arrow { .bb-buttonbar .tooltip.bottom .tooltip-arrow; }
+
+  .bb-lastchat, .bb-lastupdate {
+    margin-bottom: @vert-padding;
+    margin-top: @vert-padding;
+    padding: 0 (15px + @right-size) 0 (14px + @left-size);
+    & > .left { margin-left: (-@left-size); }
+    & > .right { margin-right: (-@right-size);
+                 text-align: right;
+                 a[title], a[data-original-title] { position:relative; }
+      .bb-pop-out { font-size: 80%; }
+    }
+    &, .messageRow { .ellipsis; }
+  }
+  .bb-lastchat .messageRow {
+    margin-top: 0;
+    margin-bottom: 0;
+    font: 90%;
+    line-height: 1.25;
+  }
+  .bb-lastchat > .right { line-height: 16px; }
+  .bb-lastchat, .bb-lastupdate {
+    .timestamp { color: #555; }
+  }
+  .bb-lastupdate {
+    .comma-list { text-transform: uppercase; }
+  }
+  .bb-chat-presence {
+    .ellipsis;
+    /* tweak the height by 1px to get text baselines to line up. */
+    /* yes, this is incredibly anal. */
+    padding-top: 1px;
+    margin-bottom: -1px;
+  }
+
+  .answer {
+    text-transform: uppercase;
+    font-family: monospace;
+    font-size: 1rem;
+  }
+  .bb-colorbox {
+    display: inline-block;
+    width: 1em;
+    height:1em;
+    border: 0.1em solid black;
+    vertical-align: text-bottom;
+  }
+  .bb-othermeta {
+    display: inline-block;
+  }
+  input[type=color] {
+    width: 14px;
+    height: 14px;
+    padding: 0px 0px;
+    margin-right: 0.25em;
+  }
+}
+
+#bb-sidebar {		    
+  .bb-sidenav {
+    margin-top: 10px;
+    background-color: #fff;	
+    border-radius: 6px;
+    border: 1px solid #e5e5e5;	
+    -webkit-border-radius: 6px;	
+    -moz-border-radius: 6px;	
+    vertical-align: text-bottom;
+
+    position: fixed;
+  }
+
+  border-radius: 6px;
+
+  .bb-othermeta {
+    -webkit-box-shadow: 0 1px 4px rgba(0,0,0,.065);		 
+    display: inline-block;
+    -moz-box-shadow: 0 1px 4px rgba(0,0,0,.065);		
+  }
+  box-shadow: 0 1px 4px rgba(0,0,0,.065);		
+  input[type=color] {
+    border: 1px solid #e5e5e5;		
+    width: 14px;
+    height: 14px;
+    position: fixed; /* for wide screens */		
+    padding: 0px 0px;
+    margin-right: 0.25em;
+    & > li:first-child {
+        text-align: center; /* wiki link */
+        }		
+    li.nav-header, li > a { 
+      .ellipsis; 
+    }		
+    /* Chevrons */		
+    .icon-chevron-right {		
+      float: right;		
+      margin-top: 2px;		
+      margin-right: -6px;		
+      opacity: .25;		
+    }		
+  }
+}
+
+#bb-right-sidebar {
+  position: fixed;
+  right: 14px;
+  bottom: 0px;
+  top: @navbar-height + 10px;
+  display: flex;
+  flex-direction: column;
+
+  & > div { position: relative; }
+
+  .bb-hide-status {
+    position: absolute;
+    margin-top: 0;
+    top: 10px;
+    left: -21px;
+    right: auto;
+    z-index: 1;
+    @media(max-width: 980px) {
+      left: -14px;
+    }
+    -webkit-box-shadow: none;
+       -moz-box-shadow: none;
+            box-shadow: none;
+  }
+
+  .bb-status-grid {
+    background: white;
+    margin-top: 10px;
+    margin-left: -7px;
+    margin-right: -7px;
+    overflow-y: auto;
+    @media(max-width: 980px) {
+      margin-left: 0px;
+      margin-right: 0px;
+    }
+    min-height: 66px;
+    -webkit-border-radius: 6px;
+       -moz-border-radius: 6px;
+            border-radius: 6px;
+    -webkit-border-top-left-radius: 0;
+       -moz-border-top-left-radius: 0;
+            border-top-left-radius: 0;
+    border: 1px solid #e5e5e5;
+    -webkit-box-shadow: 0 1px 4px rgba(0,0,0,0.065);
+       -moz-box-shadow: 0 1px 4px rgba(0,0,0,0.065);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.065);
+
+    padding: 5px;
+    font-size: 80%;
+
+    .bb-status-grid-round {
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    td {
+      padding: 0px;
+    }
+    .bb-status-grid-meta {
+      padding-right:2px;
+    }
+    .bb-status-grid-cell {
+      display: inline-block;
+      width: 1.5em;
+      text-align: center;
+    }
+    .bb-status-solved {
+      background:#bcffa6;
+    }
+    .bb-status-stuck {
+      background:#ffd333;
+    }
+    .bb-status-unsolved {
+      background:#FCFCFC;
+    }
+  }
+}
+
+.gCanEdit.bb-editable {
+  &:hover {
+    background: #fcffc0;
+    cursor: pointer;
+  }
+  input {
+    margin-top: 2px;
+    margin-bottom: 2px;
+    min-height: auto;
+  }
+}
+
+.bb-canEdit .bb-editable {
+  &:hover {
+    background: #fcffc0;
+    cursor: pointer;
+  }
+  input {
+    margin-top: 2px;
+    margin-bottom: 2px;
+    min-height: auto;
+  }
+}
+.bb-canEdit {
+  /* adjust height of tags layout so that things don't shift badly when
+   * the item is being edited (which uses a 24px input box) */
+  dt,dd {
+    &.bb-editable { min-height: 24px; }
+  }
+  .bb-tag-table td.bb-editable { min-height: 24px; }
+  /* tweak table column to make room for add tag/up/down icons */
+  td.puzzle-name > div { padding-right: (14px)*3; }
+}
+.bb-puzzle-title {
+  font-size: 14px;
+}
+
+#bb-tables {
+  background: white;
+  margin-top: 10px;
+  padding-bottom: 15px;
+  padding-left: 15px;
+  padding-right: 15px;
+  -webkit-border-radius: 6px;
+     -moz-border-radius: 6px;
+          border-radius: 6px;
+  border: 1px solid #e5e5e5;
+  -webkit-box-shadow: 0 1px 4px rgba(0,0,0,0.065);
+     -moz-box-shadow: 0 1px 4px rgba(0,0,0,0.065);
+          box-shadow: 0 1px 4px rgba(0,0,0,0.065);
+  font-size: 93%; /* 13px for body text */
+
+  h1.bb-blackboard-h1 {
+    font-size: 200%;
+    text-decoration: underline;
+    color: #888;
+    margin-bottom: 0;
+    text-align: center;
+  }
+  h2 {
+    font-size: 200%;
+    .bb-edit-icon, .bb-delete-icon { margin-top: 13px; }
+  }
+  h3 {
+    font-size: 130%;
+    line-height: 28px;
+    .bb-edit-icon, .bb-delete-icon { margin-top: 7px; }
+  }
+  h2,h3 {
+    margin-bottom: 0;
+    position: relative; /* fixes z-order issues, makes whole width clickable */
+    .bb-edit-icon, .bb-delete-icon {
+      &.pull-right { margin-right: 5px; }
+      &.pull-left  { margin-left: 4px; margin-right: 3px; }
+    }
+  }
+  .bb-top-buttons {
+    margin-top: 8px;
+    .btn-group-vertical {
+      margin-top: 2px;
+      & > .checkbox {
+        margin-bottom: 0;
+      }
+    }
+    /* ensure we can click on them */
+    position: relative;
+    z-index: 99;
+    .dropdown-menu {
+      left: unset;
+      right: 0;
+    }
+    .bb-mechanics-dropdown .btn {
+      font-size: 11.9px;
+      padding: 2px 10px;
+      .bb-canEdit& {
+        font-size: 10.5px;
+        padding: 0 6px;
+      }
+    }
+    .bb-sort-order .fa-clock {
+      margin-right: -3px;
+    }
+  }
+  .bb-round-buttons, .bb-meta-buttons {
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+  .bb-round-chat {
+    font-size: 50%;
+    margin-top: 7px;
+  }
+  a i.fas, button.btn-link i.fas {
+    color: black;
+    margin-left: 2px;
+  }
+  dl {
+    margin: 0;
+    &:empty { display: none; }
+    dt {
+      .bb-edit-icon { margin-left: 3px; }
+    }
+    dd {
+      position: relative; /* fixes z-order, makes whole width clickable */
+      .bb-edit-icon { margin-right: 5px; }
+      .bb-delete-icon { margin-right: 3px; }
+    }
+    dt,dd {
+      .bb-edit-icon, .bb-delete-icon { margin-top: 3px; }
+    }
+  }
+  tr.bb-status-stuck td {
+    background-color: #ffd333;
+  }
+  tr.bb-status-solved td {
+    padding-left: 6px;
+    background-color: #bcffa6;
+  }
+  .bb-puzzle {
+    margin-bottom: 0;
+    tr.meta, tr.metafooter {
+      --tr-bg: rgba(255,255,255,0.75);
+      .boring & {
+        background: #f8f8f8;
+      }
+      .bb-puzzle-title {
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 1.2em;
+      }
+    }
+    tr.metafooter .num-hidden { font-size: 10.5px }
+    tr.puzzle, tr.round-empty {
+      --tr-bg: rgba(255,255,255,0.85);
+      .boring & {
+        background: white;
+      }
+    }
+    tr.meta, tr.puzzle, tr.metafooter, tr.round-empty {
+      background: var(--tr-bg);
+    }
+    .bb-edit-icon, .bb-delete-icon {
+      margin-top: 3px;
+    }
+    td .bb-delete-icon.pull-left {
+      margin-left: -2px;
+      margin-right: 3px;
+    }
+    .puzzle-sidebar {
+      width: 10px;
+      border-top: 0px;
+      border-bottom: 0px;
+    }
+    .puzzle-name {
+      .bb-favorite-button { float: right; }
+      & > div {
+        /* relative positioning context for .bb-puzzle-add-move.
+        * Note that firefox doesn't allow position: relative on a table cell */
+        position: relative;
+      }
+      .bb-puzzle-add-move {
+        display: block; width: 14px*3; height: 14px;
+        position: absolute; right: -2px; top: 3px;
+        .bb-add-tag, .bb-move-up, .bb-move-down {
+          display: inline-block; width: 14px; height: 14px;
+          position: relative;
+          float: left;
+          i { position: absolute; top: 0; left: 0; margin-top: 0px; }
+          &:hover { cursor: pointer; }
+        }
+        button {
+          padding: 0; margin: 0; border: none; text-shadow: none;
+          line-height: 14px; height: 14px;
+        }
+        .bb-add-tag {
+          i + i {
+          top: 3px;
+          -webkit-transform-origin: bottom left;
+              -moz-transform-origin: bottom left;
+                  transform-origin: bottom left;
+          -webkit-transform: scale(0.5);
+              -moz-transform: scale(0.5);
+                  transform: scale(0.5);
+          }
+        }
+      }
+    }
+    .bb-tag-table {
+      font-size: 90%;
+      border-collapse: collapse;
+      position: relative;/* fixes z-order issues, makes whole width clickable */
+      &, td, tr { border: none; }
+      td { padding: 0 3px; margin: 0; }
+      .bb-edit-icon {
+        &.pull-left { margin-left: -6px; margin-right: 4px; }
+        &.pull-right { margin-left: 2px; margin-right: -3px; }
+      }
+      .bb-mechanics-dropdown .btn {
+        font-size: 10.5px;
+        padding: 0 6px;
+      }
+    }
+    td,th { padding-top: 0; padding-bottom: 0; }
+    /* try to make table spacing more-or-less consistent */
+    td,th {
+      position: relative; /* fix z-order issues, make whole width clickable */
+      padding: 4px;
+    }
+
+    .puzzle-working {
+      .background { color: #ccc; }
+    }
+    td.puzzle-update {
+      font-size: 85%;
+    }
+  }
+}
+
+.bb-hide-status {
+  position: fixed;
+  right: 0;
+  background: white;
+  margin-top: 10px;
+  padding-top: 25px;
+  padding-bottom: 25px;
+  -webkit-border-top-left-radius: 6px;
+     -moz-border-top-left-radius: 6px;
+          border-top-left-radius: 6px;
+  -webkit-border-bottom-left-radius: 6px;
+     -moz-border-bottom-left-radius: 6px;
+          border-bottom-left-radius: 6px;
+  border: 1px solid #e5e5e5;
+  border-right: none;
+  -webkit-box-shadow: 0 1px 4px rgba(0,0,0,0.065);
+     -moz-box-shadow: 0 1px 4px rgba(0,0,0,0.065);
+          box-shadow: 0 1px 4px rgba(0,0,0,0.065);
+  &:hover { cursor: pointer; }
+  i { width: 14px; height: 14px; }
+}
+
+/* Responsive
+-------------------------------------------------- */
+
+/* tweak heading for narrow displays */
+@media (max-width: 1270px) {
+  #bb-tables.bb-canEdit > h1 .bb-hide-when-narrow { display: none; }
+}
+@media (max-width: 1114px) {
+  #bb-tables.bb-canEdit > h1.bb-blackboard-h1 { white-space: nowrap; }
+  #bb-tables.bb-canEdit > h1 .bb-hide-when-narrower { display: none; }
+}
+@media (max-width: 1088px) {
+  #bb-tables > h1 .bb-hide-when-narrow { display: none; }
+}
+@media (max-width: 942px) {
+  #bb-tables > h1.bb-blackboard-h1 { white-space: nowrap; }
+  #bb-tables > h1 .bb-hide-when-narrower { display: none; }
+}
+
+/* Desktop large
+------------------------- */
+@media (min-width: 1200px) {
+}
+
+/* Desktop
+------------------------- */
+@media (max-width: 980px) {
+  /* navbar becomes unfixed below 980px */
+  .navbar-fixed-top, .bb-chat-messages { margin-bottom: 0; }
+  .navbar-fixed-bottom { margin-top: 0; }
+  .navbar-fixed-top {
+    padding: 0;
+    .navbar-inner { padding: 0px; }
+  }
+  .container-fluid > .navbar-fixed-top {
+    position: absolute;
+  }
+  #messages {
+    padding-top: @navbar-height - 20px;
+    /* Need this amount of specificity to override .row-fluid rule. */
+    #bb-body .bb-splitter & { padding-top: 0px; }
+  }
+  .bb-puzzleround { padding-top: 0 !important; }
+  .bb-chat-footer { margin-left: -20px; margin-right: -20px; }
+  #bb-body {
+    padding-top: 0px;
+    padding-bottom: 0;
+    #bb-content > #bb-blackboard {
+      padding-top: @navbar-height;
+    }
+  }
+  #bb-tables {
+    section {
+      padding-top: 0;
+      margin-top: 0;
+    }
+  }
+  .bb-hide-status {
+    position: absolute; /* unfix */
+  }
+  #bb-right-sidebar {
+    /* unfix right sidebar */
+    position: static;
+  }
+  /* fixup fullHeight stuff */
+  html.fullHeight {
+    body { padding-right: 0; padding-left: 0; }
+    #bb-content {
+      & > .bb-topbar {
+        position: absolute;
+        top: 0;
+        left: 0; right: 0; width: auto;
+        padding: 0;
+        margin: 0;
+      }
+      & > .bb-puzzleround {
+        position: absolute;
+        left: 20px; right: 20px; width: auto;
+        top: 109px; bottom: 3px; height: auto;
+        padding-top: 0;
+      }
+    }
+  }
+}
+
+/* Tablet to desktop
+------------------------- */
+@media (min-width: 768px) and (max-width: 980px) {
+  /* Remove any padding from the body */
+  body {
+    padding-top: 0;
+  }
+  .bb-buttonbar .bb-login { float: right }
+  td.puzzle-answer, td.puzzle-status, td.puzzle-working, td.puzzle-update {
+    word-break: break-all;
+  }
+}
+
+/* Tablet
+------------------------- */
+@media (max-width: 767px) {
+  /* Remove any padding from the body */
+  body {
+    padding-top: 0;
+  }
+  #roomName { width:85px; } /* narrow room name input */
+  .bb-omit-when-narrow, .puzzle-working, .puzzle-update { display: none !important; }
+  .bb-buttonbar .bb-login { float: right }
+  td.puzzle-answer { word-break: break-all; }
+
+  /* fix up .dl-horizontal styles */
+  #bb-tables dl {
+    dt { width: auto; display: inline-block; vertical-align: top; }
+    dd { margin-left: 0; display: inline-block; }
+  }
+
+  .bb-hide-status {
+    display: none;
+  }
+  #bb-body #bb-content > #bb-blackboard {
+    padding-top: @navbar-height - 40px;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 980px) {
+  /* re-fix the chat footer to the bottom */
+  .bb-chat-footer.navbar-fixed-bottom {
+    position: fixed;
+    margin-left: 0; margin-right: 0;
+    .navbar-inner { padding: 0; margin-bottom: -1px;}
+  }
+  .bb-chat-messages { margin-bottom: 15px+26px; }
+}
+
+/* Landscape phones
+------------------------- */
+@media (max-width: 480px) {
+  /* Remove padding above jumbotron */
+  body {
+    padding-top: 0;
+  }
+  #bb-body {
+    .bb-blackboard-h1 { display: none; }
+    .bb-lastchat, .bb-lastupdate {
+      padding-left: 0px;
+      padding-right: 50px;
+      font-size: 75%;
+      & > .left { display: none; }
+    }
+    .table-condensed {
+      th, td {
+        padding: 2px;
+        font-size: 75%;
+        line-height: initial;
+      }
+    }
+  }
+}

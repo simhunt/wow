@@ -1,0 +1,183 @@
+#bb-body .navbar-fixed-top {
+  height: 100%;
+  line-height: 16px;
+  display: flex;
+  flex-flow: column nowrap;
+  pointer-events: none;
+  box-shadow: unset;
+  align-items: stretch;
+
+  @media (max-width: 767px) {
+    margin-left: 0px;
+    margin-right: 0px;
+  }
+  .navbar-inner, .bb-breadcrumbs .nav {
+    pointer-events: auto;
+    background: url('/img/irongrip.png');
+    color: #c4c4c4;
+    strong,b {  color: #f5f5f5; }
+    .messageRow, .actionRow, .bb-lastupdate {
+      &, & .timestamp { color: #c4c4c4; }
+    }
+    border: 0px;
+    li .dropdown-menu::after { border-bottom-color: #333 }
+  }
+  .bb-breadcrumbs {
+    position: relative;
+    display: flex;
+    flex-flow: column nowrap;
+    overflow-x: auto;
+    width: -webkit-min-content;
+    width: -moz-min-content;
+    width: min-content;
+    flex-grow: 1;
+    flex-shrink: 1;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    .fill {
+      flex-grow: 1;
+      flex-shrink: 1;
+    }
+    .nav {
+      &.bb-omit-when-narrow {
+        @media (max-width: 767px) {
+          display: flex !important;
+          top: -40px;
+        }
+      }
+      height: 40px;
+      display: flex;
+      // width: -webkit-max-content;
+      // width: -moz-max-content;
+      // width: max-content;
+      // min-width: 100%;
+      flex-flow: row nowrap;
+      justify-content: stretch;
+      float: none;
+      margin: 0px;
+      border-bottom: 1px solid black;
+      box-shadow: 0px 2px 4px #777;
+      li {
+        display: flex;
+        flex-grow: 0;
+        flex-shrink: 0;
+        @media (max-width: 767px) {
+          & > a {
+            padding-left: 10px;
+            padding-right: 10px;
+          }
+        }
+        & > a + a {
+          padding-left: 0px;
+          margin-left: -10px;
+          @media (max-width: 767px) {
+            margin-left: -5px;
+          }
+        }
+        i.current, .current i {
+          border-bottom: 2px solid white;
+        }
+        a:not(.current) i:not(.current):hover {
+          border-bottom: 1px solid white;
+        }
+        &.dropdown.open > ul.dropdown-menu {
+          display: flex;
+          background: url('/img/irongrip.png');
+          color: #c4c4c4;
+          flex-flow: column nowrap;
+          & > li {
+            display: flex;
+            flex-flow: row nowrap;
+            color: #c4c4c4;
+            a {
+              color: #c4c4c4;
+              &:hover { background: none; }
+            }
+          }
+        }
+      }
+      & > .fill {
+        flex-grow: 1;
+        flex-shrink: 1;
+        overflow: hidden;
+      }
+      .bb-drive-buttons {
+        .bb-drive-link + .tooltip .tooltip-arrow {
+          left: auto; right: 20px;
+        }
+      }
+    }
+  }
+  .bb-lastupdate, .bb-lastchat {
+    /* add some subtle highlighting to tie the 'more' links to the
+     * left-hand content */
+    &:hover {
+      background: rgba(0,0,0,0.1);
+      border-radius: 5px;
+    }
+    width: 20%;
+  }
+}
+.bb-statuslight {
+  line-height: 1;
+  display: inline-block;
+  vertical-align: middle;
+  &:before {
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    content: var(--glyph);
+  }
+  .connected & { --glyph: "\f111"; color: #0F0; }
+  .connecting & { --glyph: "\f1ce"; animation: fa-spin 2s infinite linear; color: #FF0; }
+  .failed &, .offline & { --glyph: "\f057"; color: #F00; }
+  .waiting & { --glyph: "\f110"; animation: fa-spin 2s infinite steps(8); color: #F80; }
+}
+#bb-body {
+  .timestamp { font-size: .65em; }
+}
+
+@media(max-width:480px) {
+  .modal-header { display: none }
+}
+
+#nickPick {
+  .gravatar {
+    float: left;
+    @media(max-width: 480px) {
+      float: right;
+      img {
+        width:60px;
+        height:60px;
+      }
+    }
+  }
+}
+
+form#joinRoom {
+  margin: 6px 6px 0 0; /* properly center search field */
+  .input-prepend {
+    .add-on {
+      color: #666;
+      -webkit-border-radius: 14px 0 0 14px;
+         -moz-border-radius: 14px 0 0 14px;
+              border-radius: 14px 0 0 14px;
+    }
+  }
+}
+
+/* ensure typeahead is shown over modals */
+ul.typeahead { z-index: 1099; }
+
+/* fixup alertify styles */
+#alertify {
+ font-size: 16px;
+ form { margin: 0; }
+ #alertify-text { margin-bottom: 15px; }
+ input { padding: 4px 6px; height: 100%; }
+}
+
+/* google picker */
+.picker.modal-dialog, .picker.modal-dialog-bg { z-index: 9999 !important; }

@@ -1,0 +1,350 @@
+.navbar-inverse {
+    box-shadow: 0px 2px 4px #777;
+}
+
+.bb-chat-callin {
+    position: fixed; top: 5px; left: 10px; z-index: 1050;
+    &.solved {
+      top: 0; left: 0;
+      background: white;
+      padding-left: 15px; padding-right: 8px; padding-bottom: 1px;
+      border: 1px solid #888;
+      border-bottom-right-radius: 5px;
+    }
+}
+
+.bb-content-area {
+  background-color: white;
+  box-shadow: 0px 2px 4px #777;
+}
+.bb-puzzleround {
+  .bb-content-area;
+  .bb-chat-messages {
+    .bb-tiny-chat-messages;
+  }
+}
+.compactHeader .bb-chat-messages {
+  padding-top: 3px;
+}
+.bb-chat-messages {
+  @chat-arrow-size: 6px;
+  @chat-arrow-height: 15px;
+  @gravatar-size: 48px;
+  .media + .media.bb-message-followup {
+      margin-top: -9px;
+      &:before, &:after {
+        visibility: hidden;
+      }
+      & > .media-object {
+        visibility: hidden;
+        height: 1px;
+      }
+      .bb-message-body {
+        min-height: 0px;
+        -webkit-border-top-left-radius: 0;
+        -webkit-border-top-right-radius: 0;
+           -moz-border-radius-topleft: 0;
+           -moz-border-radius-topright: 0;
+                border-top-left-radius: 0;
+                border-top-right-radius: 0;
+        .media-heading { display: none; }
+      }
+  }
+  &.bb-starred-messages {
+    padding: 0px;
+    clear: both;
+  }
+  .bb-message-star {
+    display: inline-block;
+    float: right;
+    padding-right: 0.3em;
+    position: relative;
+    width: 1em;
+    height: 1em;
+    &::before, &::after {
+      font-family: "Font Awesome 5 Free";
+      content: "\f005";
+      position: absolute;
+      right: 3px;
+    }
+    &::before { font-weight: 900; }
+    &::after { font-weight: 400; }
+  }
+  .bb-delete-message {
+    position: relative;
+    float: right;
+    cursor: pointer;
+    padding-right: 0.3em;
+    height: 1em;
+    width: 1em;
+    &::before {
+      font-family: "Font Awesome 5 Free";
+      position: absolute;
+      right: 3px;
+      font-weight: 900;
+      content: "\f2ed";
+    }
+  }
+  .starred .bb-message-star {
+    &::after {
+      color: grey;
+    }
+    &::before {
+      color: palegoldenrod;
+    }
+  } 
+  &.can-modify-star {
+    .bb-message-star::after {
+      color: black;
+    }
+    .starred .bb-message-star::before {
+      color: gold;
+    }
+    .bb-message:not(.starred) .bb-message-star::before {
+      color: transparent;
+    }
+  }
+  .media {
+    position: relative; /* establish context for arrow placement */
+    margin-bottom: 6px;
+    .timestamp.pull-right { margin-bottom: 0; }
+    &, &:first-child { margin-top: 6px; }
+    &:before, &:after {
+      content:"";
+      position: absolute;
+      top: @chat-arrow-height;
+      left: @gravatar-size + 10px + 1px - @chat-arrow-size;
+      width: 0; height: 0;
+      border-color: transparent;
+      border-style: solid;
+      border-width: @chat-arrow-size @chat-arrow-size @chat-arrow-size 0;
+      border-right-color: white;
+    }
+    &:before {
+      border-width: (@chat-arrow-size + 2px) (@chat-arrow-size + 1px) (@chat-arrow-size + 2px) 0;
+      border-right-color: #ccc;
+      top: @chat-arrow-height - 2px;
+      left: @gravatar-size + 10px - @chat-arrow-size;
+    }
+  }
+  .bb-message-body {
+    min-height: @gravatar-size; /* match gravatar height */
+    background-color: white;
+    box-sizing: border-box;
+    padding: 2px 5px;
+    border: 1px solid #ccc;
+    -webkit-border-radius: 5px;
+       -moz-border-radius: 5px;
+            border-radius: 5px;
+    .media-heading { margin-bottom: 0; color: #666; }
+  }
+  .bb-message-pm {
+    @bb-message-pm-color: rgb(232,237,255);
+    .bb-message-body {
+      background-color: @bb-message-pm-color;
+    }
+    &.media:after { border-right-color: @bb-message-pm-color; }
+  }
+  .bb-message-presence {
+    display: inline-block;
+    padding-right: 10px;
+    &:before {
+      .glyphicon;
+    }
+    &.join:before {
+      content: "\f067"
+    }
+    &.part:before {
+      content: "\f068"
+    }
+    & > img {
+      padding-right: 3px;
+    }
+  }
+  .bb-message-system {
+    color: #888;
+    font-size: 12px;
+    line-height: 16px;
+  }
+  .bb-message-tweet {
+    .fab.fa-twitter {
+      color:  #38A1F3;
+    }
+    blockquote {
+      padding-bottom: 0;
+      margin-bottom: 0;
+      border-left-color: #38A1F3;
+    }
+  }
+  .bb-message-action {
+    font-weight: bold; background: #eee; color: #444;
+    padding: 2px 0;
+  }
+  .bb-message-action, .bb-message-system {
+    padding-left: 80px;
+    padding-right: 5px;
+  }
+  .bb-message-body, .bb-message-action, .bb-message-system {
+    .timestamp {
+      color: #ccc;
+      padding-right: 5px;
+    }
+  }
+  .bb-message-last-read {
+    color: #33f;
+    border-bottom: 2px solid #66f;
+    font-size: 8px;
+    line-height: 8px;
+    margin-top: -8px;
+    padding-left: 1px;
+    /* compensate for 20px of padding on container-fluid */
+    margin-left: -20px; margin-right: -20px;
+  }
+  .bb-quip-action {
+    &:before {
+      content: "answers the phone: ";
+      font-weight: normal;
+    }
+    & > a.quips-link {
+      float: right;
+      margin-right: 5px;
+      font-size: .65em;
+      font-weight: normal;
+      color: #66aacc;
+      text-transform: uppercase;
+      &:after { content: "[Add new quip]"; }
+    }
+  }
+}
+table.poll {
+  width: 100%;
+  td.results {
+    width: 100%;
+    .progress {
+      width: 100%;
+      margin-bottom: 0px;
+      .bar { overflow: hidden } 
+    } 
+  }
+  td.option button {
+    width: 100%;
+    white-space: nowrap;
+    @media (max-width: 767px) { white-space: initial; } 
+  }
+}
+
+.glyphicon {
+  display: inline-block;
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+}
+.glyphicon-white {
+  .glyphicon;
+  color: white;
+}
+.bb-message-body, .bb-chat-presence, .bb-puzzle {
+  .near {
+    /*border: 1px dashed #cc0;*/
+    &:before {
+      .glyphicon;
+      content: "\f3c5";
+      opacity: 0.6;
+      margin-right: 2px;
+    }
+  }
+}
+.bb-puzzle .background.near:before { opacity: 0.2; }
+.bb-chat-presence .near:before { .glyphicon-white; }
+
+.bb-tiny-chat-messages {
+  .media {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    /* hide chat bubble arrows when display gets too narrow */
+    &:before, &:after { display: none; }
+    .timestamp { float: right; /* still */ }
+    .media-object.pull-left { float: left; /* still */ margin: 0px; }
+    .img-rounded {
+              border-radius: 0px;
+         -moz-border-radius: 0px;
+      -webkit-border-radius: 0px;
+    }
+  }
+  .media + .media.bb-message-followup { margin-top: -4px; }
+  .bb-message-action, .bb-message-system { padding-left: 6px; }
+  .bb-message-last-read { margin-left: 0px; margin-right: 0px; }
+  .bb-message-body {
+    /* min-height: 0; */
+            border-radius: 0px;
+       -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding-left: 0px;
+    padding-right: 0px;
+    background: white;
+  }
+  .navbar-fixed-top, .navbar-fixed-bottom {
+    margin-left: 0px;
+    margin-right: 0px;
+  }
+  .bb-chat-messages {
+    .bb-tiny-chat-messages;
+  }
+}
+/*
+@media (max-width: 432px) {
+  .bb-chat-messages .media-object.pull-left { display: none; }
+} 
+*/
+.messageRow, .actionRow {
+  color: #666; /*font-size: 1.2em; margin: 4px 5px;*/
+}
+.actionRow {
+  font-style: italic;
+  background-color: rgb(244,255,253);
+  color: rgb(4,121,170);
+}
+.systemRow {
+  margin: 0; font-size: .8em; color: #aaa; padding: 1px 4px!important;
+}
+
+.bb-chat-footer {
+  &.navbar-inverse .navbar-inner {
+    //background-image:url(/img/darkdenim3.png);
+  }
+  form {
+    padding-left: 15px;
+    padding-right: 15px;
+    textarea {
+      overflow: hidden;
+      margin-bottom: 0; margin-top: 5px;
+      resize: none; height: 30px;
+    }
+  }
+}
+
+.modal .warning {
+  color: red; margin-bottom: 10px;
+}
+
+.inline-image {
+  max-width: 200px;
+  max-height: 200px;
+  &.image-loading {
+    width: 1px;
+    height: 1px;
+  }
+}
+
+.inline-image:hover {
+  max-width: 2000px;
+  max-height: 2000px;
+}
+
+.highlight-nick {
+  color: #0000ff;
+}

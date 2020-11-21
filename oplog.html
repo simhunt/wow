@@ -1,0 +1,27 @@
+<template name="oplog">
+<div class="row-fluid bb-puzzleround">
+{{#if Template.subscriptionsReady}}
+  {{#if startOfChannel}}
+    <button disabled="" class="btn btn-small btn-block btn-info bb-oplog-start">No earlier events</button>
+  {{else}}
+    <button class="btn btn-small btn-info btn-block bb-oplog-load-more">Load more events</button>
+  {{/if}}
+{{else}}
+  <button class="btn btn-small btn-info btn-block active bb-chat-loading">Loading <i class="fas fa-spin fa-spinner"></i></button>
+{{/if}}
+{{#each oplogs}}
+  {{#unless dawn_of_time}}
+  <div class="bb-oplog">
+    <span class="timestamp">{{pretty_ts this.timestamp}}</span>
+    {{body}} {{prettyType}}
+    {{link id}}
+    {{#if nick}} (<strong title="{{nickOrName nick}}">{{nick}}</strong>){{/if}}
+  </div>
+  {{/unless}}
+{{else}}
+  <p align="center">
+  No operation logs.
+  </p>
+{{/each}}
+</div>
+</template>
