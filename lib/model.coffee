@@ -86,9 +86,7 @@ if Meteor.isServer
 #   incorrectAnswers: [ { answer: "Wrong", who: "answer submitter",
 #                         backsolve: ..., provided: ..., timestamp: ... }, ... ]
 #   tags: status: { name: "Status", value: "stuck" }, ... 
-#   drive: optional google drive folder id
 #   spreadsheet: optional google spreadsheet id
-#   doc: optional google doc id
 #   favorites: object whose keys are userids of users who favorited this
 #              puzzle. Values are true. On the client, either empty or contains
 #              only you.
@@ -210,8 +208,6 @@ drive_id_to_link = (id) ->
   "https://docs.google.com/folder/d/#{id}/edit"
 spread_id_to_link = (id) ->
   "https://docs.google.com/spreadsheets/d/#{id}/edit"
-doc_id_to_link = (id) ->
-  "https://docs.google.com/document/d/#{id}/edit"
 
 (->
   # private helpers, not exported
@@ -329,30 +325,28 @@ doc_id_to_link = (id) ->
     updateDoc.$unset["tags.#{canonical(name)}"] = ''
     true
 
-  newDriveFolder = (id, name) ->
+  newSheet = (id, name) ->
     check id, NonEmptyString
     check name, NonEmptyString
     return unless Meteor.isServer
     res = share.drive.createPuzzle name
     return unless res?
     Puzzles.update id, { $set:
-      drive: res.id
-      spreadsheet: res.spreadId
-      doc: res.docId
+      spreadsheet: res
     }
 
-  renameDriveFolder = (new_name, drive, spreadsheet, doc) ->
+  renameSheet = (new_name, spreadsheet) ->
     check new_name, NonEmptyString
     check drive, NonEmptyString
     check spreadsheet, Match.Optional(NonEmptyString)
     check doc, Match.Optional(NonEmptyString)
     return unless Meteor.isServer
-    share.drive.renamePuzzle(new_name, drive, spreadsheet, doc)
+    share.drive.renamePuzzle(new_name, spreadsheet)
 
-  deleteDriveFolder = (drive) ->
-    check drive, NonEmptyString
+  deleteSheet = (sheet) ->
+    check sheet, NonEmptyString
     return unless Meteor.isServer
-    share.drive.deletePuzzle drive
+    share.drive.deletePuzzle sheet
 
   moveWithinParent = (id, parentType, parentId, args) ->
     check id, NonEmptyString
@@ -427,9 +421,7 @@ doc_id_to_link = (id) ->
         incorrectAnswers: []
         solved: null
         solved_by: null
-        drive: args.drive or null
         spreadsheet: args.spreadsheet or null
-        doc: args.doc or null
         link: args.link or link
         feedsInto: feedsInto
       if args.puzzles?
@@ -458,8 +450,8 @@ doc_id_to_link = (id) ->
           $set:
             touched_by: p.touched_by
             touched: p.touched
-      # create google drive folder (server only)
-      newDriveFolder p._id, p.name
+      # create google sheet (server only)
+      newSheet p._id, p.name
       return p
     renamePuzzle: (args) ->
       check @userId, NonEmptyString
@@ -468,12 +460,10 @@ doc_id_to_link = (id) ->
         name: NonEmptyString
       # get drive ID (racy)
       p = Puzzles.findOne args.id
-      drive = p?.drive
-      spreadsheet = p?.spreadsheet if drive?
-      doc = p?.doc if drive?
+      spreadsheet = p?.spreadsheet
       result = renameObject "puzzles", {args..., who: @userId}
-      # rename google drive folder
-      renameDriveFolder args.name, drive, spreadsheet, doc if result and drive?
+      # rename google sheet
+      renameSheet args.name, spreadsheet
       return result
     deletePuzzle: (pid) ->
       check @userId, NonEmptyString
@@ -1013,14 +1003,14 @@ doc_id_to_link = (id) ->
 
     # if a round/puzzle folder gets accidentally deleted, this can be used to
     # manually re-create it.
-    fixPuzzleFolder: (args) ->
+    fixSheet: (args) ->
       check @userId, NonEmptyString
       check args, ObjectWith
         type: ValidType
         object: IdOrObject
         name: NonEmptyString
       id = args.object._id or args.object
-      newDriveFolder id, args.name
+      newSheet id, args.name
 
     shareFolder: (email) ->
       check @userId, NonEmptyString
@@ -1054,5 +1044,4 @@ share.model =
   canonical: canonical
   drive_id_to_link: drive_id_to_link
   spread_id_to_link: spread_id_to_link
-  doc_id_to_link: doc_id_to_link
   UTCNow: UTCNow

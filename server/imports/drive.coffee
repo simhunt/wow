@@ -8,7 +8,7 @@ DEFAULT_ROOT_FOLDER_NAME = "MIT Mystery Hunt #{new Date().getFullYear()}"
 ROOT_FOLDER_NAME = -> Meteor.settings.folder or process.env.DRIVE_ROOT_FOLDER or DEFAULT_ROOT_FOLDER_NAME
 CODEX_ACCOUNT = -> Meteor.settings.driveowner or process.env.DRIVE_OWNER_ADDRESS
 WORKSHEET_NAME = (name) -> "Worksheet: #{name}"
-DOC_NAME = (name) -> "Notes: #{name}"
+SHEET_TEMPLATE_ID = Meteor.settings.template
 
 # Constants
 GDRIVE_FOLDER_MIME_TYPE = 'application/vnd.google-apps.folder'
@@ -16,7 +16,6 @@ GDRIVE_SPREADSHEET_MIME_TYPE = 'application/vnd.google-apps.spreadsheet'
 GDRIVE_DOC_MIME_TYPE = 'application/vnd.google-apps.document'
 XLSX_MIME_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 MAX_RESULTS = 200
-SPREADSHEET_TEMPLATE = Assets.getBinary 'spreadsheet-template.xlsx'
 
 quote = (str) -> "'#{str.replace(/([\'\\])/g, '\\$1')}'"
 
@@ -93,48 +92,6 @@ ensureNamedPermissions = (drive, id, email) =>
       id: resp.id
   'ok'
 
-spreadsheetSettings =
-  titleFunc: WORKSHEET_NAME
-  driveMimeType: GDRIVE_SPREADSHEET_MIME_TYPE
-  uploadMimeType: XLSX_MIME_TYPE
-  uploadTemplate: ->
-    # The file is small enough to fit in ram, so don't recreate a file read
-    # stream every time.
-    # Apparently there's a module called streamifier that does this.
-    r = new Readable
-    r._read = ->
-    r.push SPREADSHEET_TEMPLATE
-    r.push null
-    r
-
-docSettings =
-  titleFunc: DOC_NAME
-  driveMimeType: GDRIVE_DOC_MIME_TYPE
-  uploadMimeType: 'text/plain'
-  uploadTemplate: -> 'Put notes here.'
-  
-ensure = (drive, name, folder, settings) ->
-  console.log('folderId =', folder.id)
-  doc = apiThrottle drive.children, 'list',
-    folderId: folder.id
-    q: "title=#{quote settings.titleFunc name} and mimeType=#{quote settings.driveMimeType}"
-    maxResults: 1
-  .items[0]
-  unless doc?
-    doc =
-      title: settings.titleFunc name
-      mimeType: settings.uploadMimeType
-      parents: [id: folder.id]
-    doc = apiThrottle drive.files, 'insert',
-      convert: true
-      body: doc
-      resource: doc
-      media:
-        mimeType: settings.uploadMimeType
-        body: settings.uploadTemplate()
-  ensurePermissions drive, doc.id
-  doc
-
 awaitFolder = (drive, name, parent) ->
   triesLeft = 5
   loop
@@ -210,18 +167,22 @@ rmrfFolder = (drive, id) ->
 export class Drive
   constructor: (@drive) ->
     @rootFolder = (awaitOrEnsureFolder @drive, ROOT_FOLDER_NAME()).id
-    @ringhuntersFolder = (awaitOrEnsureFolder @drive, "#{Meteor.settings?.public?.chatName ? 'Ringhunters'} Uploads", @rootFolder).id
-  
+
   createPuzzle: (name) ->
-    folder = ensureFolder @drive, name, @rootFolder
-    # is the spreadsheet already there?
-    spreadsheet = ensure @drive, name, folder, spreadsheetSettings
-    doc = ensure @drive, name, folder, docSettings
-    return {
-      id: folder.id
-      spreadId: spreadsheet.id
-      docId: doc.id
-    }
+    sheet = apiThrottle @drive.children, 'list',
+      folderId: @rootFolder
+      q: "title=#{quote name}"
+      maxResults: 1
+    .items[0]
+    unless sheet?
+      sheet = apiThrottle @drive.files, 'copy',
+        fileId: SHEET_TEMPLATE_ID,
+        resource: { 
+          title: name,
+          parents: [ {id: @rootFolder} ]
+        }
+    ensurePermissions @drive, sheet.id
+    sheet.id
 
   findPuzzle: (name) ->
     resp = apiThrottle @drive.children, 'list',
