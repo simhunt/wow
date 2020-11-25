@@ -185,26 +185,12 @@ export class Drive
     sheet.id
 
   findPuzzle: (name) ->
-    resp = apiThrottle @drive.children, 'list',
-      folderId: @rootFolder
-      q: "title=#{quote name} and mimeType=#{quote GDRIVE_FOLDER_MIME_TYPE}"
-      maxResults: 1
-    folder = resp.items[0]
-    return null unless folder?
-    # TODO: batch these requests together.
-    # look for spreadsheet
     spread = apiThrottle @drive.children, 'list',
-      folderId: folder.id
-      q: "title=#{quote WORKSHEET_NAME name}"
-      maxResults: 1
-    doc = apiThrottle @drive.children, 'list',
-      folderId: folder.id
-      q: "title=#{quote DOC_NAME name}"
+      folderId: @rootFolder
+      q: "title=#{quote name}"
       maxResults: 1
     return {
-      id: folder.id
       spreadId: spread.items[0]?.id
-      docId: doc.items[0]?.id
     }
 
   listPuzzles: ->
@@ -213,7 +199,7 @@ export class Drive
     loop
       resp = apiThrottle @drive.children, 'list',
         folderId: @rootFolder
-        q: "mimeType=#{quote GDRIVE_FOLDER_MIME_TYPE}"
+        q: "mimeType=#{quote GDRIVE_SPREADSHEET_MIME_TYPE}"
         maxResults: MAX_RESULTS
         pageToken: resp.nextPageToken
       results.push resp.items...
@@ -242,7 +228,7 @@ export class Drive
   shareFolder: (email) -> ensureNamedPermissions @drive, @rootFolder, email
 
   # purge `rootFolder` and everything in it
-  purge: -> rmrfFolder @drive, rootFolder
+  purge: -> rmrfFolder @drive, @rootFolder
 
 # generate functions
 skip = (type) -> -> console.warn "Skipping Google Drive operation:", type

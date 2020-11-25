@@ -452,6 +452,13 @@ spread_id_to_link = (id) ->
             touched: p.touched
       # create google sheet (server only)
       newSheet p._id, p.name
+      # create Discord voice channel
+      if Meteor.isServer
+        round = Rounds.findOne(args.round)
+        if round.name?
+          share.discordBot.newVoiceChannel(round.name, p.name)
+        else
+          share.discordBot.newVoiceChannel("no round", p.name)
       return p
     renamePuzzle: (args) ->
       check @userId, NonEmptyString
@@ -883,7 +890,8 @@ spread_id_to_link = (id) ->
       id = args.target._id or args.target
 
       # Only perform the update and oplog if the answer is changing
-      oldAnswer = Puzzles.findOne(id)?.tags.answer?.value
+      puzzle = Puzzles.findOne(id)
+      oldAnswer = puzzle?.tags.answer?.value
       if oldAnswer is args.answer
         return false
 
@@ -919,6 +927,7 @@ spread_id_to_link = (id) ->
         _id: id
         'tags.answer.value': $ne: args.answer
       , updateDoc
+      share.discordBot.deleteVoiceChannelWithTimeout(puzzle.name)
       return false if updated is 0
       oplog "Found an answer (#{args.answer.toUpperCase()}) to", 'puzzles', id, @userId, 'answers'
       return true
