@@ -190,7 +190,7 @@ export class DiscordBot
       unless self.guild?
         console.warn "DAPHNE is not added to #{guildName}!"
         return
-      self.purge()
+      # self.purge()
       # Map each round to its category channels
       # and map each category channel to its round
       self.guild.channels.cache.forEach((channel, snowflake) ->

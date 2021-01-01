@@ -18,4 +18,4 @@ Promise.await do ->
   catch error
     console.warn "Error trying to set up DAPHNE:", error
     console.warn "Discord integration disabled."
-    share.drive = new FailDiscordBot
+    share.discordBot = new FailDiscordBot
