@@ -11,10 +11,10 @@ import emojify from './emoji.coffee'
 # Things that are true no matter what
 S_TO_MS = 1000
 GREEN_CHECK = emojify(":white_check_mark:")
-MAX_CHANNELS_IN_CATEGORY = 50
+MAX_CHANNELS_IN_CATEGORY = 3 # should be 50
 
 # Parameters (can be changed according to preference)
-VOICE_CHANNEL_DELETE_DELAY = 60 * S_TO_MS
+VOICE_CHANNEL_DELETE_DELAY = 10 * S_TO_MS
 DELAYS = [100, 250, 500, 1000, 2000, 5000, 10000]
 
 # Ensure mutual exclusion
@@ -57,43 +57,33 @@ getChannels = (guild, query, channelCollection) ->
   channelCollection.forEach((channel, snowflake) ->
     if ((!query?.type? || query.type == channel.type) && 
         (!query?.name? || query.name == channel.name) &&
-        (!query?.round? || query.round == @channelIdToRoundName.channel.id))
+        (!query?.round? || query.round == channelIdToRoundName[channel.id]))
       result.push(channel)
   )
   return result
   
 getCategoriesForRound = (name) ->
-  console.log('getCategoriesForRound')
   if roundNameToCategories[name]?
     return roundNameToCategories[name]
   return []
 
 getNonfullCategoryForRound = (guild, roundName) ->
-  console.log('getNonfullCategoryForRound')
   result = null
   categories = await getCategoriesForRound(roundName)
-  console.log(categories)
   for category in categories
-    console.log(category)
     if category.children.size < MAX_CHANNELS_IN_CATEGORY
       result = category
-  if result?
-    console.log('found existing category that works', result)
   return result if result?
   # We need to make a new channel
-  console.log('making a new channel')
   newCategory = null
   continuationNumber = categories.length + 1
   try
     if continuationNumber <= 1
-      console.log('make the first category for this round')
       newCategoryName = roundName
       newCategory = await apiThrottle guild.channels, 'create', newCategoryName, {type: "category"}
       roundNameToCategories[roundName] = [newCategory]
-      console.log(roundNameToCategories)
       channelIdToRoundName[newCategory.id] = roundName
     else 
-      console.log('make a continuation category for this round')
       newCategoryName = "#{roundName}-#{continuationNumber}"
       newCategory = await apiThrottle guild.channels, 'create', newCategoryName, {type: "category"}
       roundNameToCategories[roundName].push(newCategory)
@@ -102,8 +92,9 @@ getNonfullCategoryForRound = (guild, roundName) ->
   catch error
     console.warn error
 
+# 'public'
+# adds a voice channel with name `name` to the round with name `roundName` in the guild `guild`
 newVoiceChannel = (guild, roundName, name) -> 
-  console.log("new voice channel for round " + roundName + " with name " + name)
   self = this
   mutex.acquire().then((release) ->
     if getChannels(guild, {type: "voice", name: name, round: roundName}).length > 0
@@ -116,6 +107,7 @@ newVoiceChannel = (guild, roundName, name) ->
   )
   'ok'
 
+# 'private' (aka helper method - please hold mutex before calling)
 # identifier is an object containing `name` and/or `channel` 
 # (where `channel` takes precedence)
 deleteChannel = (identifier, guild, type) ->
@@ -124,35 +116,60 @@ deleteChannel = (identifier, guild, type) ->
   else 
     channel = getChannels(guild, {type: type, name: identifier.name})?[0]
   # Perform deletion of channel in Discord
-  console.log('deleting channel ' + channel)
   await apiThrottle channel, 'delete', "Puzzle solved!"
   # Maintain rep invariants
   roundName = channelIdToRoundName[channel.id]
   unless roundName?
     return 'ok'
-  categories = await getCategoriesForRound(roundName)
-  for category in categories
+  # This channel ID no longer exists, so it doesn't have a round.
+  delete channelIdToRoundName[channel.id]
+  await handleEmptyCategories(guild, roundName)
+  'ok'
+  
+
+# 'private' helper method - please hold lock before calling
+handleEmptyCategories = (guild, affectedRound) -> 
+  # First, iterate through all the current categories;
+  # Delete the Discord categories that no longer have children,
+  # and delete them from the CoffeScript categories map as well.
+  oldCategories = await getCategoriesForRound(affectedRound)
+  newCategories = []
+  for category in oldCategories
     if category.children.size == 0
       await apiThrottle category, 'delete'
-      break
-  categories = await getCategoriesForRound(roundName) 
-  if categories.length == 0
-    delete roundNameToCategories[roundName]
+      delete channelIdToRoundName[category.id]
+    else
+      newCategories.push(category) # copy channel references
+  if newCategories.length == 0
+    delete roundNameToCategories[affectedRound]
   else
-    if categories[0].name != roundName
-      await apiThrottle categories[0], 'setName', roundName
-    for i in [1...categories.length]
-      if categories[i].name != "#{roundName}-#{i+1}"
-        await apiThrottle categories[0], 'setName', roundName
-  delete channelIdToRoundName[channel.id]
+    # Rename the categories that still exist so that their names are
+    # affectedRound, affectedRound-2, affectedRound-3... with no gaps
+    if newCategories[0].name != affectedRound
+      await apiThrottle newCategories[0], 'setName', affectedRound
+    for i in [1...newCategories.length]
+      if newCategories[i].name != "#{affectedRound}-#{i+1}"
+        await apiThrottle newCategories[i], 'setName', "#{affectedRound}-#{i+1}"
+    roundNameToCategories[affectedRound] = newCategories # change the global storage
   'ok'
 
+# 'public'
+# deletes the channel with name `name` from the guild `guild`
+deleteVoiceChannel = (guild, name) ->
+  mutex.acquire().then((release) ->
+    await deleteChannel({name: name}, guild, 'voice')
+    release()
+  )
+  'ok'
+
+# 'public'
+# deletes the channel with name `name` from the guild `guild`
 deleteVoiceChannelWithTimeout = (guild, name) ->
   channel = null
   mutex.acquire().then((release) ->
     channel = getChannels(guild, {type: 'voice', name: name})?[0]
     if channel?
-      await apiThrottle channel, 'setName', "#{GREEN_CHECK}#{name}"
+      await apiThrottle channel, 'setName', "#{GREEN_CHECK}     #{name}"
       release()
       deleteAfterTimeout = () -> 
         mutex.acquire().then((release) ->
@@ -165,6 +182,9 @@ deleteVoiceChannelWithTimeout = (guild, name) ->
   )
   'ok'
 
+# 'public'
+# purges all channels in a guild
+# ONLY MEANT FOR DEVELPMENT / DEBUGGING. VERY DANGEROUS.
 purge = (guild) ->
   mutex.acquire().then((release) ->
     channels = getChannels(guild)
@@ -194,7 +214,6 @@ export class DiscordBot
       # Map each round to its category channels
       # and map each category channel to its round
       self.guild.channels.cache.forEach((channel, snowflake) ->
-        console.log(channel, snowflake)
         if channel.type == 'category'
           dashIndex = channel.name.lastIndexOf('-')
           if dashIndex == -1
@@ -211,9 +230,11 @@ export class DiscordBot
             roundNameToCategories[baseName] = [channel]
           channelIdToRoundName[channel.id] = baseName
       )
-      roundNameToCategories.forEach(channelList -> channelList.sort())
+      for roundName, channelList of roundNameToCategories
+        console.log(channelList)
+        channelList.sort()
       # Associate each non-category channel to a round
-      self.guild.cache.forEach((channel, snowflake) ->
+      self.guild.cache?.forEach((channel, snowflake) ->
         if channel.type != 'category'
           if channel.parent?
             channelIdToRoundName[channel.id] = channelIdToRoundName[channel.parent.id]
@@ -222,6 +243,7 @@ export class DiscordBot
     @client.login(discordToken)
 
   newVoiceChannel: (roundName, name) -> newVoiceChannel(@guild, roundName, name)
+  deleteVoiceChannel: (name) -> deleteVoiceChannel(@guild, name)
   deleteVoiceChannelWithTimeout: (name) -> deleteVoiceChannelWithTimeout(@guild, name)
   purge: -> purge(@guild)
   
@@ -230,5 +252,6 @@ export class DiscordBot
 skip = (type) -> -> console.warn "Skipping Discord operation:", type
 export class FailDiscordBot
   newVoiceChannel: skip 'newVoiceChannel'
+  deleteVoiceChannel: skip 'deleteChannel'
   deleteVoiceChannelWithTimeout: skip 'deleteVoiceChannelWithTimeout'
   purge: skip 'purge'

@@ -2,7 +2,7 @@
 import canonical from '../lib/imports/canonical.coffee'
 import { StringWithLength } from '../lib/imports/match.coffee'
 
-PASSWORD = Meteor.settings?.password ? process.env.TEAM_PASSWORD 
+PASSWORD = Meteor.settings?.teampassword ? process.env.TEAM_PASSWORD 
 
 Meteor.users.deny
   update: -> true

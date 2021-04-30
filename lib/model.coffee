@@ -303,6 +303,8 @@ spread_id_to_link = (id) ->
       oplog "Deleted "+pretty_collection(type)+" "+name, \
           type, null, args.who
     collection(type).remove(args.id)
+    if type == 'puzzles'
+      share.discordBot.deleteVoiceChannel(name)
     return true
 
   setTagInternal = (updateDoc, args) ->
@@ -971,6 +973,8 @@ spread_id_to_link = (id) ->
       deleteTagInternal updateDoc, 'backsolve'
       deleteTagInternal updateDoc, 'provided'
       Puzzles.update id, updateDoc
+      puzzle = Puzzles.findOne(id)
+      share.discordBot.newVoiceChannel(getRoundForPuzzle(id), puzzle.name)
       oplog "Deleted answer for", 'puzzles', id, @userId
       return true
 
