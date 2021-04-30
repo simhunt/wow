@@ -147,19 +147,20 @@
         </div>
         {{/if}}
 
-      <!-- Protect / edit buttons -->
-       {{#if currentPageEquals "blackboard"}}
-       <div class="btn-group">
+        <!-- Protect / edit buttons -->
+        {{#if currentPageEquals "blackboard"}}
+	      {{#if canEdit}}
         <button title="Protect page" data-canEdit="false"
-                class="bb-protect btn btn-small btn-inverse {{#unless canEdit}}active{{/unless}}">
-         <i class="icon-lock icon-white"></i>
+                class="bb-protect btn btn-small btn-inverse active">
+          <i class="fas fa-lock-open"></i>
         </button>
+      	{{else}}
         <button title="Allow edits to puzzles" data-canEdit="true"
-                class="bb-unprotect btn btn-small btn-inverse {{#if canEdit}}active{{/if}} {{#unless sessionNick}}disabled{{/unless}}">
-         <i class="icon-pencil icon-white"></i>
+                class="bb-unprotect btn btn-small btn-inverse active {{#unless sessionNick}}disabled{{/unless}}">
+          <i class="fas fa-lock"></i>
         </button>
-       </div>
-       {{/if}}
+	      {{/if}}
+        {{/if}}
 
         <div class="btn-group">
          <button data-original-title="{{connectStatus.status}}{{#if connectStatus.retryTime}} until {{pretty_ts connectStatus.retryTime}}{{/if}}"
