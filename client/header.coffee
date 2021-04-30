@@ -179,8 +179,10 @@ Template.header_loginmute.events
     Meteor.logout()
   "click .bb-unprotect": (event, template) ->
     share.Router.navigate "/edit", {trigger: true}
+    $(template.find('.tooltip')).hide()
   "click .bb-protect": (event, template) ->
     share.Router.navigate "/", {trigger: true}
+    $(template.find('.tooltip')).hide()
   "click .connected, click .connecting, click .waiting": (event, template) ->
     Meteor.disconnect()
   "click .failed, click .offline": (event, template) ->
