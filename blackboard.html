@@ -6,11 +6,11 @@
         {{#each rounds}}
         <li class="nav-header">{{name}}</li>
         {{#each metas}}
-        <li><a href="#m{{puzzle._id}}"><i class="fas fa-chevron-right"></i>
+        <li><a href="#meta-anchor{{puzzle._id}}"><i class="fas fa-chevron-right"></i>
         {{puzzle.name}}</a></li>
         {{/each}}
         {{#if unassigned.length}}
-        <li><a href="#unassigned{{_id}}"><i class="fas fa-chevron-right"></i>Unassigned</a></li>
+        <li><a href="#unassigned-anchor{{_id}}"><i class="fas fa-chevron-right"></i>Unassigned</a></li>
         {{/if}}
         {{/each}}
       </ul>
@@ -180,6 +180,7 @@
   
   <template name="blackboard_unassigned">
     {{#if this.length}}
+      <a name="unassigned-anchor{{../_id}}" style="display: block; position: relative; top: -40px; visibility: hidden"></a>
       <tbody class="unassigned" id="unassigned{{../_id}}">
       <tr><th colspan="{{nCols}}">Unassigned</th></tr>
       {{#each this}}
@@ -419,6 +420,7 @@
   
   <template name="blackboard_meta">
     {{#if showMeta}}
+    <a name="meta-anchor{{puzzle._id}}" style="display: block; position: relative; top: -40px; visibility: hidden"></a>
     <tbody class="meta" id="m{{puzzle._id}}" data-puzzle-id="{{puzzle._id}}">
       <tr class="puzzle-color-header" style="background: {{color}};">
           <td colspan="100"></td>
