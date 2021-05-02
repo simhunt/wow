@@ -74,15 +74,54 @@
     {{#if message.tweet}}
       <img src="{{message.tweet.avatar}}" class="media-object pull-left img-rounded" width=48 height=48>
     {{else if message.mail}}
-       {{gravatar id=message.nick image="wavatar" size=48 classes="media-object pull-left img-rounded" }}
+       <!-- {{gravatar id=message.nick image="wavatar" size=48 classes="media-object pull-left img-rounded" }} -->
     {{else}}
-      {{gravatar id=email image="wavatar" size=48 classes="media-object pull-left img-rounded" }}
+      <!-- {{gravatar id=email image="wavatar" size=48 classes="media-object pull-left img-rounded" }} -->
     {{/if}}
-    <div class="media-body bb-message-body">
+    <div class="media-body bb-message-body bb-message-not-from-me">
       <div class="pull-right timestamp">{{pretty_ts message.timestamp}}</div>
       {{#unless message.to}}
         {{! can't star a PM. }}
-        <div class="bb-message-star"></div>
+        <!-- <div class="bb-message-star"></div> -->
+      {{/unless}}
+      <!-- {{> message_delete_button}} -->
+      <h5 class="media-heading">
+        {{#if message.tweet}}
+          <i class="fab fa-twitter"></i> @<a href="https://twitter.com/{{message.nick}}" target="_blank">{{message.nick}}</a> <a href="https://twitter.com/{{message.nick}}/status/{{message.tweet.id_str}}" target="_blank">tweeted</a>:
+        {{else if message.mail}}
+          Mail from {{#with message.mail.sender_name}}{{this}}{{else}}{{message.nick}}{{/with}} <i class="fas fa-envelope"></i> {{message.mail.subject}}
+        {{else}}
+          <span title="{{message.nick}}">{{nickOrName message.nick}}</span>
+              {{#if message.to}}
+        <small>(Private message to {{nickOrName message.to}})</small>
+              {{/if}}
+        {{/if}}
+      </h5>
+      {{cleanup message.body}}
+      {{#if message.tweet.quote}}
+        <h6>in reply to @<a href="https://twitter.com/{{message.tweet.quote_nick}}" target="_blank">{{message.tweet.quote_nick}}</a>'s <a href="https://twitter.com/{{message.tweet.quote_nick}}/status/{{message.tweet.quote_id_str}}" target="_blank">tweet</a>:</h6>
+        <blockquote>{{cleanup message.tweet.quote}}</blockquote>
+      {{/if}}
+      {{#if message.poll}}{{> poll message.poll}}{{/if}}
+    </div> 
+  </div>  
+</template>
+
+<template name="media_message_from_me">
+  <div class="bb-message media{{#if message.to}} bb-message-pm{{/if}}{{#if message.mail}} bb-message-mail{{/if}}{{#if message.tweet}} bb-message-tweet{{/if}}{{#if message.starred}} starred{{/if}}"
+       data-nick="{{message.nick}}" data-pm-to="{{message.to}}" data-read="{{#unless read}}un{{/unless}}read">
+    {{#if message.tweet}}
+      <img src="{{message.tweet.avatar}}" class="media-object pull-left img-rounded" width=48 height=48>
+    {{else if message.mail}}
+       <!-- {{gravatar id=message.nick image="wavatar" size=48 classes="media-object pull-left img-rounded" }} -->
+    {{else}}
+      <!-- {{gravatar id=email image="wavatar" size=48 classes="media-object pull-left img-rounded" }} -->
+    {{/if}}
+    <div class="media-body bb-message-body bb-message-from-me">
+      <div class="pull-right timestamp">{{pretty_ts message.timestamp}}</div>
+      {{#unless message.to}}
+        {{! can't star a PM. }}
+        <!-- <div class="bb-message-star"></div> -->
       {{/unless}}
       {{> message_delete_button}}
       <h5 class="media-heading">
@@ -140,22 +179,23 @@
     {{/if}}
     {{#each messages}}{{scrollHack}}
       {{#if message.dawn_of_time}}<!-- Channel creation -->
-      {{else if message.presence}}
-        <div class="bb-message-presence {{message.presence}}" title="{{cleanup message.body}}" data-read="{{#unless read}}un{{/unless}}read">
-          {{gravatar id=email image="wavatar" size=14 }}{{message.nick}}
-        </div>
-      {{else if message.system}}
-        <div class="bb-message-system" data-read="{{#unless read}}un{{/unless}}read">
-          <div class="pull-right timestamp">{{pretty_ts message.timestamp}}</div>
-          {{> message_delete_button}}
-          {{cleanup message.body}}
-        </div>
-      {{else if usefulEnough message}}
+      {{else if fromMe message}}
         {{#if message.action}}
           <div class="bb-message-action" data-nick="{{message.nick}}" data-read="{{#unless read}}un{{/unless}}read">
             <div class="pull-right timestamp">{{pretty_ts message.timestamp}}</div>
             {{> message_delete_button}}
-            {{gravatar id=email image="wavatar" size=14 }}
+            <!-- {{gravatar id=email image="wavatar" size=14 }} -->
+            <span title="{{message.nick}}">{{nickOrName message.nick}}</span> {{cleanup message.body}}
+          </div>
+        {{else}}
+          {{> media_message_from_me }}
+        {{/if}}
+      {{else}}
+        {{#if message.action}}
+          <div class="bb-message-action" data-nick="{{message.nick}}" data-read="{{#unless read}}un{{/unless}}read">
+            <div class="pull-right timestamp">{{pretty_ts message.timestamp}}</div>
+            {{> message_delete_button}}
+            <!-- {{gravatar id=email image="wavatar" size=14 }} -->
             <span title="{{message.nick}}">{{nickOrName message.nick}}</span> {{cleanup message.body}}
           </div>
         {{else}}

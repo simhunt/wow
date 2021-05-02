@@ -56,7 +56,7 @@ instachat = {}
 instachat["UTCOffset"] = new Date().getTimezoneOffset() * 60000
 instachat["alertWhenUnreadMessages"] = false
 instachat["scrolledToBottom"]        = true
-instachat['readMarker'] = $ '<div class="bb-message-last-read">read</div>'
+instachat['readMarker'] = $ '<div class="bb-message-last-read"></div>'
 instachat["mutationObserver"] = new MutationObserver (recs, obs) ->
   for rec in recs
     console.log rec unless Meteor.isProduction
@@ -186,17 +186,24 @@ Template.messages.helpers
   # The dawn of time message has ID equal to the room name because it's
   # efficient to find it that way on the client, where there are no indexes.
   startOfChannel: -> model.Messages.findOne(_id: Session.get 'room_name')?
-  usefulEnough: (m) ->
-    # test Session.get('nobot') last to get a fine-grained dependency
-    # on the `nobot` session variable only for 'useless' messages
+  # usefulEnough: (m) ->
+  #   # test Session.get('nobot') last to get a fine-grained dependency
+  #   # on the `nobot` session variable only for 'useless' messages
+  #   myNick = Meteor.userId()
+  #   botnick = botuser()._id
+  #   m.nick is myNick or m.to is myNick or \
+  #       m.useful or \
+  #       (m.nick isnt 'via twitter' and m.nick isnt botnick and \
+  #           not m.useless_cmd) or \
+  #       doesMentionNick(m) or \
+  #       ('true' isnt reactiveLocalStorage.getItem 'nobot')
+  # usefulEnough: (m) ->
+  #   return true
+  
+  fromMe: (m) ->
     myNick = Meteor.userId()
-    botnick = botuser()._id
-    m.nick is myNick or m.to is myNick or \
-        m.useful or \
-        (m.nick isnt 'via twitter' and m.nick isnt botnick and \
-            not m.useless_cmd) or \
-        doesMentionNick(m) or \
-        ('true' isnt reactiveLocalStorage.getItem 'nobot')
+    return m.nick is myNick
+
   messages: ->
     room_name = Session.get 'room_name'
     # I will go out on a limb and say we need this because transform uses
