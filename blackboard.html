@@ -121,7 +121,7 @@
   
   <template name="blackboard_round">
     <tbody>
-    <tr><th colspan="{{nCols}}" id="round{{_id}}">
+    <tr><th></th><th id="round{{_id}}">
       <h2 class="bb-editable" data-bbedit="rounds/{{_id}}/title">
       {{#if editing "rounds" _id "title"}}
         <input type="text" id="rounds-{{_id}}-title"
@@ -169,7 +169,7 @@
         </button>
       </div>
     {{/if}}
-    </th></tr></tbody>
+    </th><th colspan="{{nCols}}-2"></th></tr></tbody>
     {{#each metas}}
       {{> blackboard_meta }}
     {{/each}}
