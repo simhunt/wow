@@ -11,7 +11,7 @@ import emojify from './emoji.coffee'
 # Things that are true no matter what
 S_TO_MS = 1000
 GREEN_CHECK = emojify(":white_check_mark:")
-MAX_CHANNELS_IN_CATEGORY = 3 # should be 50
+MAX_CHANNELS_IN_CATEGORY = 50
 
 # Parameters (can be changed according to preference)
 VOICE_CHANNEL_DELETE_DELAY = 10 * S_TO_MS
@@ -183,6 +183,36 @@ deleteVoiceChannelWithTimeout = (guild, name) ->
   'ok'
 
 # 'public'
+# renames a channel
+rename = (guild, oldName, newName) ->
+  # We don't have to worry about duplication; that's handled before the call to this function in model.coffee
+  mutex.acquire().then((release) -> 
+    newRoundNameToCategories = {}
+    newChannelIdToRoundName = {}
+    for roundName, categories of roundNameToCategories
+      # If the thing that is being changed is a round, keep the same category channels (we'll rename them at the end of the function)
+      # but update the name of the key.
+      if roundName == oldName
+        newRoundNameToCategories[newName] = categories
+      else
+        # The round is not changing, so the round name -> category channel mapping does not need to change.
+        newRoundNameToCategories[roundName] = categories
+    # Also replace references to the round in the channel ID -> round name mapping.
+    for channelId, roundName of channelIdToRoundName
+      newChannelIdToRoundName[channelId] = roundName == oldName ? roundName : newName
+
+    # Now make sure that channels in Discord are being named appropriately
+    for channel in getChannels(guild)
+      name = channel.name
+      if name == oldName or name.search("#{oldName}-") != -1 # assume that "oldName-" only appears in category channels "within" rounds.
+        await apiThrottle channel, 'setName', name.replace(oldName, newName)
+    roundNameToCategories = newRoundNameToCategories
+    channelIdToRoundName = newChannelIdToRoundName
+    release()
+  )
+  'ok'
+
+# 'public'
 # purges all channels in a guild
 # ONLY MEANT FOR DEVELPMENT / DEBUGGING. VERY DANGEROUS.
 purge = (guild) ->
@@ -190,10 +220,10 @@ purge = (guild) ->
     channels = getChannels(guild)
     for channel in channels
       await deleteChannel({channel: channel}, guild, channel)
+    roundNameToCategories = {}
+    channelIdToRoundName = {}
     release()
   )
-  roundNameToCategories = {}
-  channelIdToRoundName = {}
   'ok'
 
 export class DiscordBot
@@ -220,7 +250,7 @@ export class DiscordBot
             baseName = channel.name
           else
             continuationNumber = channel.name.substring(dashIndex+1)
-            if continuationNumber.isNan()
+            if isNaN(continuationNumber)
               baseName = channel.name
             else
               baseName = channel.name.substring(0, dashIndex)
@@ -231,7 +261,6 @@ export class DiscordBot
           channelIdToRoundName[channel.id] = baseName
       )
       for roundName, channelList of roundNameToCategories
-        console.log(channelList)
         channelList.sort()
       # Associate each non-category channel to a round
       self.guild.cache?.forEach((channel, snowflake) ->
@@ -245,6 +274,7 @@ export class DiscordBot
   newVoiceChannel: (roundName, name) -> newVoiceChannel(@guild, roundName, name)
   deleteVoiceChannel: (name) -> deleteVoiceChannel(@guild, name)
   deleteVoiceChannelWithTimeout: (name) -> deleteVoiceChannelWithTimeout(@guild, name)
+  rename: (oldName, newName) -> rename(@guild, oldName, newName)
   purge: -> purge(@guild)
   
         
@@ -254,4 +284,5 @@ export class FailDiscordBot
   newVoiceChannel: skip 'newVoiceChannel'
   deleteVoiceChannel: skip 'deleteChannel'
   deleteVoiceChannelWithTimeout: skip 'deleteVoiceChannelWithTimeout'
+  rename: skip 'rename'
   purge: skip 'purge'
