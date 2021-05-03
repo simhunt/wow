@@ -180,7 +180,7 @@
   
   <template name="blackboard_unassigned">
     {{#if this.length}}
-      <a name="unassigned-anchor{{../_id}}" style="display: block; position: relative; top: -40px; visibility: hidden"></a>
+      <a name="unassigned-anchor{{../_id}}" class="bb-anchor"></a>
       <tbody class="unassigned" id="unassigned{{../_id}}">
       <tr><th colspan="{{nCols}}">Unassigned</th></tr>
       {{#each this}}
@@ -199,21 +199,28 @@
         {{#each metas}}
         <tr>
           <td class="bb-status-grid-meta bb-status-{{#if puzzle.solved}}solved{{else if stuck puzzle}}stuck{{else}}unsolved{{/if}}">
-              {{link id=puzzle._id title="meta" text=puzzle.name}}
-          </td><td class="bb-status-grid-puzzles">
-          {{#each puzzles puzzle.puzzles}}<div class="bb-status-grid-cell bb-status-{{#if puzzle.solved}}solved{{else if stuck puzzle}}stuck{{else}}unsolved{{/if}}">
-              {{link id=puzzle._id title=puzzle.name text=puzzle_num}}
-          </div>{{/each}}</td>
+            <a href="#meta-anchor{{puzzle._id}}">{{puzzle.name}}</a>
+          </td>
+          <td class="bb-status-grid-puzzles">
+            {{#each puzzles puzzle.puzzles}}
+            <div class="bb-status-grid-cell bb-status-{{#if puzzle.solved}}solved{{else if stuck puzzle}}stuck{{else}}unsolved{{/if}}">
+              <a href="#puzzle-anchor{{puzzle._id}}" title="{{puzzle.name}}">{{puzzle_num}}</a>
+            </div>
+            {{/each}}
+          </td>
         </tr>
         {{/each}}
         {{#with unassigned}}
           {{#if this.length}}
           <tr>
-            <td class="bb-status-grid-meta bb-status-unsolved">Unassigned</td>
+            <td class="bb-status-grid-meta bb-status-unsolved"><a href="#unassigned-anchor{{../ _id}}">Unassigned</a></td>
             <td class="bb-status-grid-puzzles">
-            {{#each puzzles this}}<div class="bb-status-grid-cell bb-status-{{#if puzzle.solved}}solved{{else if stuck puzzle}}stuck{{else}}unsolved{{/if}}">
-              {{link id=puzzle._id title=puzzle.name text=puzzle_num}}
-            </div>{{/each}}</td>
+              {{#each puzzles this}}
+              <div class="bb-status-grid-cell bb-status-{{#if puzzle.solved}}solved{{else if stuck puzzle}}stuck{{else}}unsolved{{/if}}">
+                <a href="#puzzle-anchor{{puzzle._id}}" title="{{puzzle.name}}">{{puzzle_num}}</a>
+              </div>
+              {{/each}}
+            </td>
           </tr>
           {{/if}}
         {{/with}}
@@ -420,7 +427,7 @@
   
   <template name="blackboard_meta">
     {{#if showMeta}}
-    <a name="meta-anchor{{puzzle._id}}" style="display: block; position: relative; top: -40px; visibility: hidden"></a>
+    <a name="meta-anchor{{puzzle._id}}" class="bb-anchor"></a>
     <tbody class="meta" id="m{{puzzle._id}}" data-puzzle-id="{{puzzle._id}}">
       <tr class="puzzle-color-header">
           <td style="background: {{color}}; border-top-left-radius: 100%; border-right:0;"></td>
@@ -460,6 +467,7 @@
   </template>
   
   <template name="blackboard_puzzle">
+    <a name="puzzle-anchor{{puzzle._id}}" class="bb-anchor"></a>
     <tr class="puzzle {{#if puzzle.solved}}bb-status-solved{{else if stuck puzzle}}bb-status-stuck{{/if}}" draggable="{{canEdit}}" data-puzzle-id="{{puzzle._id}}">
       {{> blackboard_puzzle_cells}}
    </tr>
