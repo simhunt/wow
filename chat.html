@@ -113,15 +113,14 @@
     {{#if message.tweet}}
       <img src="{{message.tweet.avatar}}" class="media-object pull-left img-rounded" width=48 height=48>
     {{else if message.mail}}
-       <!-- {{gravatar id=message.nick image="wavatar" size=48 classes="media-object pull-left img-rounded" }} -->
+
     {{else}}
-      <!-- {{gravatar id=email image="wavatar" size=48 classes="media-object pull-left img-rounded" }} -->
+
     {{/if}}
     <div class="media-body bb-message-body bb-message-from-me">
       <div class="pull-right timestamp">{{pretty_ts message.timestamp}}</div>
       {{#unless message.to}}
         {{! can't star a PM. }}
-        <!-- <div class="bb-message-star"></div> -->
       {{/unless}}
       {{> message_delete_button}}
       <h5 class="media-heading">
@@ -184,7 +183,6 @@
           <div class="bb-message-action" data-nick="{{message.nick}}" data-read="{{#unless read}}un{{/unless}}read">
             <div class="pull-right timestamp">{{pretty_ts message.timestamp}}</div>
             {{> message_delete_button}}
-            <!-- {{gravatar id=email image="wavatar" size=14 }} -->
             <span title="{{message.nick}}">{{nickOrName message.nick}}</span> {{cleanup message.body}}
           </div>
         {{else}}
@@ -195,7 +193,6 @@
           <div class="bb-message-action" data-nick="{{message.nick}}" data-read="{{#unless read}}un{{/unless}}read">
             <div class="pull-right timestamp">{{pretty_ts message.timestamp}}</div>
             {{> message_delete_button}}
-            <!-- {{gravatar id=email image="wavatar" size=14 }} -->
             <span title="{{message.nick}}">{{nickOrName message.nick}}</span> {{cleanup message.body}}
           </div>
         {{else}}

@@ -186,19 +186,6 @@ Template.messages.helpers
   # The dawn of time message has ID equal to the room name because it's
   # efficient to find it that way on the client, where there are no indexes.
   startOfChannel: -> model.Messages.findOne(_id: Session.get 'room_name')?
-  # usefulEnough: (m) ->
-  #   # test Session.get('nobot') last to get a fine-grained dependency
-  #   # on the `nobot` session variable only for 'useless' messages
-  #   myNick = Meteor.userId()
-  #   botnick = botuser()._id
-  #   m.nick is myNick or m.to is myNick or \
-  #       m.useful or \
-  #       (m.nick isnt 'via twitter' and m.nick isnt botnick and \
-  #           not m.useless_cmd) or \
-  #       doesMentionNick(m) or \
-  #       ('true' isnt reactiveLocalStorage.getItem 'nobot')
-  # usefulEnough: (m) ->
-  #   return true
   
   fromMe: (m) ->
     myNick = Meteor.userId()
