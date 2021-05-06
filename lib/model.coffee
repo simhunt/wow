@@ -274,7 +274,8 @@ spread_id_to_link = (id) ->
 
     # Only perform the rename and oplog if the name is changing
     # XXX: This is racy with updates to findOne().name.
-    if collection(type).findOne(args.id).name is args.name
+    oldName = collection(type).findOne(args.id).name
+    if oldName is args.name
       return false
 
     try
@@ -290,6 +291,8 @@ spread_id_to_link = (id) ->
       throw error
     unless options.suppressLog
       oplog "Renamed", type, args.id, args.who
+    if type in ['puzzles', 'rounds']
+      share.discordBot.rename(oldName, args.name)
     return true
 
   deleteObject = (type, args, options={}) ->
@@ -303,6 +306,8 @@ spread_id_to_link = (id) ->
       oplog "Deleted "+pretty_collection(type)+" "+name, \
           type, null, args.who
     collection(type).remove(args.id)
+    if type == 'puzzles'
+      share.discordBot.deleteVoiceChannel(name)
     return true
 
   setTagInternal = (updateDoc, args) ->
@@ -337,9 +342,7 @@ spread_id_to_link = (id) ->
 
   renameSheet = (new_name, spreadsheet) ->
     check new_name, NonEmptyString
-    check drive, NonEmptyString
     check spreadsheet, Match.Optional(NonEmptyString)
-    check doc, Match.Optional(NonEmptyString)
     return unless Meteor.isServer
     share.drive.renamePuzzle(new_name, spreadsheet)
 
@@ -971,6 +974,8 @@ spread_id_to_link = (id) ->
       deleteTagInternal updateDoc, 'backsolve'
       deleteTagInternal updateDoc, 'provided'
       Puzzles.update id, updateDoc
+      puzzle = Puzzles.findOne(id)
+      share.discordBot.newVoiceChannel(getRoundForPuzzle(id), puzzle.name)
       oplog "Deleted answer for", 'puzzles', id, @userId
       return true
 
