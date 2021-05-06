@@ -13,6 +13,10 @@
     }
 }
 
+.bb-chat-start {
+  margin-bottom: 5px;
+}
+
 .bb-content-area {
   background-color: white;
   box-shadow: 0px 2px 4px #777;
@@ -81,7 +85,8 @@
       font-family: "Font Awesome 5 Free";
       position: absolute;
       right: 3px;
-      font-weight: 900;
+      font-size: 0.75em;
+      font-weight: 600;
       content: "\f2ed";
     }
   }
@@ -128,18 +133,28 @@
     }
   }
   .bb-message-body {
-    min-height: @gravatar-size; /* match gravatar height */
+    // min-height: @gravatar-size; /* match gravatar height */
     background-color: white;
     box-sizing: border-box;
     padding: 2px 5px;
-    border: 1px solid #ccc;
+    margin-bottom: 5px;
+    margin-left: 2px;
+    margin-right: 2px;
+    // border: 1px solid #ccc;
     -webkit-border-radius: 5px;
        -moz-border-radius: 5px;
             border-radius: 5px;
     .media-heading { margin-bottom: 0; color: #666; }
   }
+  .bb-message-from-me {
+    background-color: rgb(232,237,255);
+  }
+
+  .bb-message-not-from-me {
+
+  }
   .bb-message-pm {
-    @bb-message-pm-color: rgb(232,237,255);
+    @bb-message-pm-color: rgb(255,245,220);
     .bb-message-body {
       background-color: @bb-message-pm-color;
     }
@@ -179,6 +194,10 @@
   .bb-message-action {
     font-weight: bold; background: #eee; color: #444;
     padding: 2px 0;
+    // border: 1px soild red;
+    margin-bottom: 5px;
+    margin-left: 5px;
+    margin-right: 5px;
   }
   .bb-message-action, .bb-message-system {
     padding-left: 80px;
@@ -191,11 +210,11 @@
     }
   }
   .bb-message-last-read {
-    color: #33f;
-    border-bottom: 2px solid #66f;
+    color: rgb(67, 67, 71);
+    border-bottom: 1px solid rgb(255,100,100);
     font-size: 8px;
     line-height: 8px;
-    margin-top: -8px;
+    margin-top: -5px;
     padding-left: 1px;
     /* compensate for 20px of padding on container-fluid */
     margin-left: -20px; margin-right: -20px;
@@ -270,7 +289,7 @@ table.poll {
       -webkit-border-radius: 0px;
     }
   }
-  .media + .media.bb-message-followup { margin-top: -4px; }
+  .media + .media.bb-message-followup { margin-top: -5px; }
   .bb-message-action, .bb-message-system { padding-left: 6px; }
   .bb-message-last-read { margin-left: 0px; margin-right: 0px; }
   .bb-message-body {
