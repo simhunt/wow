@@ -2,18 +2,6 @@
   <!-- puzzles w/ index -->
   <div id="bb-blackboard" class="row-fluid">
     <div id="bb-sidebar" class="span2">
-      <ul class="nav nav-list bb-sidenav">
-        {{#each rounds}}
-        <li class="nav-header">{{name}}</li>
-        {{#each metas}}
-        <li><a href="#meta-anchor{{puzzle._id}}"><i class="fas fa-chevron-right"></i>
-        {{puzzle.name}}</a></li>
-        {{/each}}
-        {{#if unassigned.length}}
-        <li><a href="#unassigned-anchor{{_id}}"><i class="fas fa-chevron-right"></i>Unassigned</a></li>
-        {{/if}}
-        {{/each}}
-      </ul>
     </div>
     <div id="bb-tables" class="{{#if hideStatus}}span10{{else}}span8{{/if}} {{#if canEdit}}bb-canEdit{{/if}}">
       <!-- content div -->
@@ -213,7 +201,7 @@
         {{#with unassigned}}
           {{#if this.length}}
           <tr>
-            <td class="bb-status-grid-meta bb-status-unsolved"><a href="#unassigned-anchor{{../ _id}}">Unassigned</a></td>
+            <td class="bb-status-grid-meta bb-status-unsolved"><a href="#unassigned-anchor{{../_id}}">Unassigned</a></td>
             <td class="bb-status-grid-puzzles">
               {{#each puzzles this}}
               <div class="bb-status-grid-cell bb-status-{{#if puzzle.solved}}solved{{else if stuck puzzle}}stuck{{else}}unsolved{{/if}}">
