@@ -2,18 +2,6 @@
   <!-- puzzles w/ index -->
   <div id="bb-blackboard" class="row-fluid">
     <div id="bb-sidebar" class="span2">
-      <ul class="nav nav-list bb-sidenav">
-        {{#each rounds}}
-        <li class="nav-header">{{name}}</li>
-        {{#each metas}}
-        <li><a href="#m{{puzzle._id}}"><i class="fas fa-chevron-right"></i>
-        {{puzzle.name}}</a></li>
-        {{/each}}
-        {{#if unassigned.length}}
-        <li><a href="#unassigned{{_id}}"><i class="fas fa-chevron-right"></i>Unassigned</a></li>
-        {{/if}}
-        {{/each}}
-      </ul>
     </div>
     <div id="bb-tables" class="{{#if hideStatus}}span10{{else}}span8{{/if}} {{#if canEdit}}bb-canEdit{{/if}}">
       <!-- content div -->
@@ -55,17 +43,20 @@
               </button>
             </div>
           {{/if}}
-          <div class="btn-group bb-sort-order">
-            <button class="btn btn-small {{#if sortReverse}}active{{/if}}"
-                    data-sortReverse="true" title="Newest rounds first">
+          <div class="bb-sort-order">
+            {{#unless sortReverse}}
+            <button class="btn btn-small"
+                    data-sortReverse="true" title="Oldest rounds first">
               <i class="fas fa-clock"></i>
               <i class="fas fa-long-arrow-alt-up"></i>
             </button>
-            <button class="btn btn-small {{#unless sortReverse}}active{{/unless}}"
-                    data-sortReverse="false" title="Oldest rounds first">
+            {{else}}
+            <button class="btn btn-small"
+                    data-sortReverse="false" title="Newest rounds first">
               <i class="fas fa-clock"></i>
               <i class="fas fa-long-arrow-alt-down"></i>
             </button>
+            {{/unless}}
             {{#unless canEdit}}
               {{> options }}
             {{/unless}}
@@ -118,7 +109,7 @@
   
   <template name="blackboard_round">
     <tbody>
-    <tr><th colspan="{{nCols}}" id="round{{_id}}">
+    <tr><th></th><th id="round{{_id}}">
       <h2 class="bb-editable" data-bbedit="rounds/{{_id}}/title">
       {{#if editing "rounds" _id "title"}}
         <input type="text" id="rounds-{{_id}}-title"
@@ -166,7 +157,7 @@
         </button>
       </div>
     {{/if}}
-    </th></tr></tbody>
+    </th><th colspan="{{nCols}}-2"></th></tr></tbody>
     {{#each metas}}
       {{> blackboard_meta }}
     {{/each}}
@@ -177,6 +168,7 @@
   
   <template name="blackboard_unassigned">
     {{#if this.length}}
+      <a name="unassigned-anchor{{../_id}}" class="bb-anchor"></a>
       <tbody class="unassigned" id="unassigned{{../_id}}">
       <tr><th colspan="{{nCols}}">Unassigned</th></tr>
       {{#each this}}
@@ -195,21 +187,28 @@
         {{#each metas}}
         <tr>
           <td class="bb-status-grid-meta bb-status-{{#if puzzle.solved}}solved{{else if stuck puzzle}}stuck{{else}}unsolved{{/if}}">
-              {{link id=puzzle._id title="meta" text=puzzle.name}}
-          </td><td class="bb-status-grid-puzzles">
-          {{#each puzzles puzzle.puzzles}}<div class="bb-status-grid-cell bb-status-{{#if puzzle.solved}}solved{{else if stuck puzzle}}stuck{{else}}unsolved{{/if}}">
-              {{link id=puzzle._id title=puzzle.name text=puzzle_num}}
-          </div>{{/each}}</td>
+            <a href="#meta-anchor{{puzzle._id}}">{{puzzle.name}}</a>
+          </td>
+          <td class="bb-status-grid-puzzles">
+            {{#each puzzles puzzle.puzzles}}
+            <div class="bb-status-grid-cell bb-status-{{#if puzzle.solved}}solved{{else if stuck puzzle}}stuck{{else}}unsolved{{/if}}">
+              <a href="#puzzle-anchor{{puzzle._id}}" title="{{puzzle.name}}">{{puzzle_num}}</a>
+            </div>
+            {{/each}}
+          </td>
         </tr>
         {{/each}}
         {{#with unassigned}}
           {{#if this.length}}
           <tr>
-            <td class="bb-status-grid-meta bb-status-unsolved">Unassigned</td>
+            <td class="bb-status-grid-meta bb-status-unsolved"><a href="#unassigned-anchor{{../_id}}">Unassigned</a></td>
             <td class="bb-status-grid-puzzles">
-            {{#each puzzles this}}<div class="bb-status-grid-cell bb-status-{{#if puzzle.solved}}solved{{else if stuck puzzle}}stuck{{else}}unsolved{{/if}}">
-              {{link id=puzzle._id title=puzzle.name text=puzzle_num}}
-            </div>{{/each}}</td>
+              {{#each puzzles this}}
+              <div class="bb-status-grid-cell bb-status-{{#if puzzle.solved}}solved{{else if stuck puzzle}}stuck{{else}}unsolved{{/if}}">
+                <a href="#puzzle-anchor{{puzzle._id}}" title="{{puzzle.name}}">{{puzzle_num}}</a>
+              </div>
+              {{/each}}
+            </td>
           </tr>
           {{/if}}
         {{/with}}
@@ -416,9 +415,11 @@
   
   <template name="blackboard_meta">
     {{#if showMeta}}
+    <a name="meta-anchor{{puzzle._id}}" class="bb-anchor"></a>
     <tbody class="meta" id="m{{puzzle._id}}" data-puzzle-id="{{puzzle._id}}">
-      <tr class="puzzle-color-header" style="background: {{color}};">
-          <td colspan="100"></td>
+      <tr class="puzzle-color-header">
+          <td style="background: {{color}}; border-top-left-radius: 100%; border-right:0;"></td>
+          <td colspan="100" style="background: {{color}}; border-left:0;"></td>
       </tr>
       <tr class="meta {{#if stuck puzzle}}bb-status-stuck{{else if puzzle.solved}}bb-status-solved{{/if}}">
         {{> blackboard_puzzle_cells puzzle=puzzle sidebarColor=color }}
@@ -442,6 +443,8 @@
         <span class="num-hidden">({{this}} puzzle{{#if plural this}}s{{/if}} hidden)</span>
       </td></tr>
     {{/if}}
+    <!-- Put some spacing in between metas. -->
+    <tr style="height: 5px"></tr>
     </tbody>
     {{/if}}
   </template>
@@ -452,6 +455,7 @@
   </template>
   
   <template name="blackboard_puzzle">
+    <a name="puzzle-anchor{{puzzle._id}}" class="bb-anchor"></a>
     <tr class="puzzle {{#if puzzle.solved}}bb-status-solved{{else if stuck puzzle}}bb-status-stuck{{/if}}" draggable="{{canEdit}}" data-puzzle-id="{{puzzle._id}}">
       {{> blackboard_puzzle_cells}}
    </tr>
