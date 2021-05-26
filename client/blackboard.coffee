@@ -85,6 +85,7 @@ Template.blackboard.helpers
   hideSolved: -> 'true' is reactiveLocalStorage.getItem 'hideSolved'
   hideSolvedMeta: -> 'true' is reactiveLocalStorage.getItem 'hideSolvedMeta'
   hideStatus: -> 'true' is reactiveLocalStorage.getItem 'hideStatus'
+  # darkMode: -> 'true' is reactiveLocalStorage.getItem 'darkMode'
   whoseGitHub: -> settings.WHOSE_GITHUB
 
 # Notifications
@@ -152,6 +153,18 @@ unassigned_helper = ->
   hideSolved = 'true' is reactiveLocalStorage.getItem 'hideSolved'
   return p if editing or !hideSolved
   p.filter (pp) -> !pp.puzzle.solved?
+
+# ---- Dark mode ----
+
+# Set dark mode if the system is in dark mode and the user has not already specified their preference
+prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+if prefersDarkScheme and (reactiveLocalStorage.getItem 'darkMode' is undefined)
+  reactiveLocalStorage.setItem 'darkMode', true
+
+Template.registerHelper 'darkMode', -> 'true' is reactiveLocalStorage.getItem 'darkMode'
+darkMode = 'true' is reactiveLocalStorage.getItem 'darkMode'
+if darkMode
+  document.body.classList.toggle("dark-theme")
 
 ############## groups, rounds, and puzzles ####################
 Template.blackboard.helpers

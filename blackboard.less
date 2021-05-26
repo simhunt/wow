@@ -4,6 +4,7 @@
   font-style: normal;
   font-weight: 400;
   src: local('Noto Color Emoji'), local('NotoColorEmoji'), url('../fonts/NotoColorEmoji.ttf') format('truetype');
+  color: var(--color-text);
 }
 
 @font-face
@@ -12,6 +13,7 @@
   font-style: normal;
   font-weight: 400;
   src: local('Open Sans Emoji'), local('OpenSansEmoji'), url('../fonts/OpenSansEmoji.ttf') format('truetype');
+  color: var(--color-text);
 }
 
 .width100 {
@@ -60,8 +62,9 @@ html {
 }
 
 body {
-  background: url('/img/grid_noise.png');
-  background-attachment: fixed;
+  background-color: var(--color-bg-primary);
+  // background: url('/img/grid_noise.png');
+  // background-attachment: fixed;
   font-family: "Noto Sans", sans-serif, "Noto Color Emoji", "Open Sans Emoji";
   // Override bootstrap
   input, button, select, textarea {
@@ -97,7 +100,7 @@ body.has-emojis {
   top: 0px;
   bottom: 0px;
   overflow-y: auto;
-  background-color: white;
+  background-color: inherit;
   width: 256px;
   left: -256px;
   z-index: 1050;
@@ -138,7 +141,7 @@ body.has-emojis {
     border-top: 1px solid #ccc;
   }
   h2 {
-    color: #AAA;
+    color: var(--color-h2);
   }
   td.wanted { font-style: italic; }
   .answer > span:first-child {
@@ -154,13 +157,12 @@ body.has-emojis {
     float: right; margin-top: 4px; margin-right: 3px;
   }
   .bb-left-content, .bb-top-right-content {
-    background: rgba(255,255,255,0.85);
     &.bb-status-stuck { background: #ffd333; }
-    &.bb-status-solved { background: #bcffa6; }
+    &.bb-status-solved { background: var(--color-bg-solved); }
     .boring & {
-      background: white;
+      background: inherit;
       .bb-status-stuck { background: #ffd333; }
-      .bb-status-solved { background: #4F4; }
+      .bb-status-solved { background: var(--color-bg-solved); }
     }
     .bb-mechanics-dropdown .btn {
       font-size: 10.5px;
@@ -186,57 +188,6 @@ body.has-emojis {
   padding-top: @navbar-height;
   padding-bottom: 15px;
 
-  @left-size: 85px;
-  @right-size: 45px;
-  @vert-padding: 4px;
-
-  .bb-buttonbar {
-    text-align: right;
-    padding-right: 5px;
-    .btn-group { text-align: left; }
-    .btn-toolbar { margin-top: 0; margin-bottom: 0; }
-    .tooltip-inner {
-      color: #000;
-      background-color: #eee;
-      border-color: black;
-      border-style: solid;
-      border-width: 0 1px 1px 1px;
-    }
-    .tooltip.bottom .tooltip-arrow {
-      border-bottom-color: #eee;
-    }
-    /* tweak to fix up moving buttons when tooltip appears */
-    .bb-protect { margin-right: -1px; }
-    .bb-unprotect { margin-left: 0; }
-  }
-  .bb-breadcrumbs .tooltip-inner { .bb-buttonbar .tooltip-inner; }
-  .bb-breadcrumbs .tooltip.bottom .tooltip-arrow { .bb-buttonbar .tooltip.bottom .tooltip-arrow; }
-
-  .bb-lastchat, .bb-lastupdate {
-    margin-bottom: @vert-padding;
-    margin-top: @vert-padding;
-    padding: 0 (15px + @right-size) 0 (14px + @left-size);
-    & > .left { margin-left: (-@left-size); }
-    & > .right { margin-right: (-@right-size);
-                 text-align: right;
-                 a[title], a[data-original-title] { position:relative; }
-      .bb-pop-out { font-size: 80%; }
-    }
-    &, .messageRow { .ellipsis; }
-  }
-  .bb-lastchat .messageRow {
-    margin-top: 0;
-    margin-bottom: 0;
-    font: 90%;
-    line-height: 1.25;
-  }
-  .bb-lastchat > .right { line-height: 16px; }
-  .bb-lastchat, .bb-lastupdate {
-    .timestamp { color: #555; }
-  }
-  .bb-lastupdate {
-    .comma-list { text-transform: uppercase; }
-  }
   .bb-chat-presence {
     .ellipsis;
     /* tweak the height by 1px to get text baselines to line up. */
@@ -294,7 +245,8 @@ body.has-emojis {
   }
 
   .bb-status-grid {
-    background: white;
+    color: var(--color-text);
+    background: var(--color-bg-secondary);
     margin-top: 10px;
     margin-left: -7px;
     margin-right: -7px;
@@ -310,10 +262,10 @@ body.has-emojis {
     -webkit-border-top-left-radius: 0;
        -moz-border-top-left-radius: 0;
             border-top-left-radius: 0;
-    border: 1px solid #e5e5e5;
-    -webkit-box-shadow: 0 1px 4px rgba(0,0,0,0.065);
-       -moz-box-shadow: 0 1px 4px rgba(0,0,0,0.065);
-            box-shadow: 0 1px 4px rgba(0,0,0,0.065);
+    border: 1px solid var(--color-border-primary);
+    -webkit-box-shadow: 0 1px 4px var(--color-shadow-primary);
+       -moz-box-shadow: 0 1px 4px var(--color-shadow-primary);
+            box-shadow: 0 1px 4px var(--color-shadow-primary);
 
     padding: 5px;
     font-size: 80%;
@@ -321,6 +273,7 @@ body.has-emojis {
     .bb-status-grid-round {
       font-weight: bold;
       text-transform: uppercase;
+      color: var(--color-h1);
     }
     td {
       padding: 0px;
@@ -334,20 +287,21 @@ body.has-emojis {
       text-align: center;
     }
     .bb-status-solved {
-      background:#bcffa6;
+      background: var(--color-bg-solved);
     }
     .bb-status-stuck {
       background:#ffd333;
+      color: var(--color-h1);
     }
     .bb-status-unsolved {
-      background:#FCFCFC;
+      background: inherit;
     }
   }
 }
 
 .gCanEdit.bb-editable {
   &:hover {
-    background: #fcffc0;
+    background: var(--color-highlight-hover-body);
     cursor: pointer;
   }
   input {
@@ -359,7 +313,7 @@ body.has-emojis {
 
 .bb-canEdit .bb-editable {
   &:hover {
-    background: #fcffc0;
+    background: var(--color-highlight-hover-body);
     cursor: pointer;
   }
   input {
@@ -383,7 +337,7 @@ body.has-emojis {
 }
 
 #bb-tables {
-  background: white;
+  background: var(--color-bg-secondary);
   margin-top: 10px;
   padding-bottom: 15px;
   padding-left: 15px;
@@ -391,10 +345,10 @@ body.has-emojis {
   -webkit-border-radius: 6px;
      -moz-border-radius: 6px;
           border-radius: 6px;
-  border: 1px solid #e5e5e5;
-  -webkit-box-shadow: 0 1px 4px rgba(0,0,0,0.065);
-     -moz-box-shadow: 0 1px 4px rgba(0,0,0,0.065);
-          box-shadow: 0 1px 4px rgba(0,0,0,0.065);
+  border: 1px solid var(--color-border-primary);
+  -webkit-box-shadow: 0 1px 4px var(--color-shadow-primary);
+     -moz-box-shadow: 0 1px 4px var(--color-shadow-primary);
+          box-shadow: 0 1px 4px var(--color-shadow-primary);
   font-size: 93%; /* 13px for body text */
 
   h1.bb-blackboard-h1 {
@@ -435,6 +389,10 @@ body.has-emojis {
     .dropdown-menu {
       left: unset;
       right: 0;
+      background-color: var(--color-bg-dropdown);
+      a {
+        color: var(--color-text);
+      }
     }
     .bb-mechanics-dropdown .btn {
       font-size: 11.9px;
@@ -457,7 +415,6 @@ body.has-emojis {
     margin-top: 7px;
   }
   a i.fas, button.btn-link i.fas {
-    color: black;
     margin-left: 2px;
   }
   dl {
@@ -480,7 +437,7 @@ body.has-emojis {
   }
   tr.bb-status-solved td {
     padding-left: 6px;
-    background-color: #bcffa6;
+    background-color: var(--color-bg-solved);
   }
   .bb-puzzle {
     border: 0;
@@ -492,21 +449,22 @@ body.has-emojis {
     }
     margin-bottom: 0;
     tr.meta, tr.metafooter {
-      --tr-bg: rgba(255,255,255,0.75);
+      --tr-bg: --color-bg-secondary; // TODO(jenna): is this right?
       .boring & {
-        background: #f8f8f8;
+        background: var(--color-bg-secondary); // TODO(jenna): is this right?
       }
       .bb-puzzle-title {
         font-weight: bold;
         text-transform: uppercase;
         font-size: 1.2em;
+        color: var(--color-text);
       }
     }
     tr.metafooter .num-hidden { font-size: 10.5px }
     tr.puzzle, tr.round-empty {
-      --tr-bg: rgba(255,255,255,0.85);
+      --tr-bg: --color-bg-secondary; // TODO(jenna): is this right?
       .boring & {
-        background: white;
+        background: var(--color-bg-secondary);
       }
     }
     tr.meta, tr.puzzle, tr.metafooter, tr.round-empty {
@@ -576,6 +534,8 @@ body.has-emojis {
     td,th {
       position: relative; /* fix z-order issues, make whole width clickable */
       padding: 4px;
+      border-color: var(--color-border-primary);
+      color: var(--color-text);
     }
 
     td.puzzle-update {
@@ -587,7 +547,7 @@ body.has-emojis {
 .bb-hide-status {
   position: fixed;
   right: 0;
-  background: white;
+  background: var(--color-bg-secondary);
   margin-top: 10px;
   padding-top: 25px;
   padding-bottom: 25px;
@@ -597,13 +557,13 @@ body.has-emojis {
   -webkit-border-bottom-left-radius: 6px;
      -moz-border-bottom-left-radius: 6px;
           border-bottom-left-radius: 6px;
-  border: 1px solid #e5e5e5;
+  border: 1px solid var(--color-border-primary);
   border-right: none;
-  -webkit-box-shadow: 0 1px 4px rgba(0,0,0,0.065);
-     -moz-box-shadow: 0 1px 4px rgba(0,0,0,0.065);
-          box-shadow: 0 1px 4px rgba(0,0,0,0.065);
+  -webkit-box-shadow: 0 1px 4px var(--color-shadow-primary);
+     -moz-box-shadow: 0 1px 4px var(--color-shadow-primary);
+          box-shadow: 0 1px 4px var(--color-shadow-primary);
   &:hover { cursor: pointer; }
-  i { width: 14px; height: 14px; }
+  i { width: 14px; height: 14px; color: var(--color-text); }
 }
 
 .bb-anchor {
@@ -770,4 +730,183 @@ body.has-emojis {
       }
     }
   }
+}
+
+/* Dark mode
+------------------------ */
+body {
+  /* Text colors */
+  --color-bg-primary: #d2d2d2;
+  --color-bg-secondary: white;
+  --color-text: #313131;
+  --color-text-link: #0088cc;
+  --color-navbar-icon: #999999;
+  --color-text-mechanics-tag: #555;
+
+  /* Background / surface colors */
+  --color-bg-topbar: #373737;
+  --color-bg-dropdown: white;
+  --color-bg-alert-ok: #0044cc;
+  --color-bg-mechanic-tag: #eee;
+  --color-bg-favorite-mechanic-tag: #ebb;
+
+  /* Special backgrounds / highlighting */
+  --color-bg-solved: #bcffa6;
+
+  /* Borders */
+  --color-border-primary: #dddddd;
+  --color-border-mechanic-tag: #aaa;
+  --color-border-favorite-mechanic-tag: #f99;
+
+  /* Highlighting */
+  --color-highlight-hover: #0000001a;
+  --color-highlight-hover-body: #fcffc0;
+  --color-highlight-active: #0000001f;
+
+  /* Shadows */
+  --color-shadow-primary: #0000000f;
+}
+
+body.dark-theme {
+  /* Text colors */
+  --color-text: #9b9b9b;
+  --color-h1: #d7d7d7;
+  --color-h2: #d7d7d7;
+  --color-h3: #d7d7d7;
+  --color-nav-header: #d7d7d7;
+  --color-text-link: #58a6ff;
+  --color-navbar-icon: var(--color-text);
+  --color-text-mechanics-tag: var(--color-text);
+
+  /* Background / surface colors */
+  --color-bg-primary: #121212;
+  --color-bg-secondary: #161616;
+  --color-bg-topbar: #1e1e1e;
+  --color-bg-dropdown: #222222;
+  --color-bg-alert-textbox: #282828;
+  --color-bg-alert-buttons: #1e1e1e;
+  --color-bg-alert-ok: #273461;
+  --color-bg-mechanic-tag: #282828;
+  --color-bg-favorite-mechanic-tag: #703232;
+
+  /* Special backgrounds / highlighting */
+  --color-bg-solved: #344739;
+
+  /* Borders */
+  --color-border-primary: #30363d;
+  --color-border-mechanic-tag: var(--color-border-primary);
+  --color-border-favorite-mechanic-tag: var(--color-border-primary);
+
+  /* Highlighting */
+  --color-highlight-hover: #ffffff1a;
+  --color-highlight-hover-body: var(--color-highlight-hover);
+  --color-highlight-active: #ffffff1f;
+
+  /* Shadows */
+  --color-shadow-primary: #ffffff0f;
+}
+
+.nav-header {
+  color: var(--color-nav-header);
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  text-shadow: none!important; // Need to override bootstrap default
+}
+
+.nav-list > li > a {
+  padding: 3px 15px;
+  text-shadow: none;
+}
+
+.nav-list > li > a:hover {
+  background-color: var(--color-highlight-hover);
+}
+
+a {
+  color: var(--color-text-link)
+}
+
+a:hover, a:active {
+  color: var(--color-text-link)
+}
+
+.table-bordered {
+  border-color: var(--color-border-primary);
+}
+
+h1 {
+  color: var(--color-h1);
+}
+
+h2 {
+  color: var(--color-h2);
+}
+
+h3 {
+  color: var(--color-h3);
+}
+
+.btn-link {
+  color: var(--color-text);
+}
+
+// Login screen and some popup modals
+.modal {
+  background-color: var(--color-bg-secondary);
+
+  .modal-header {
+    border-color: var(--color-border-primary);
+  }
+
+  .modal-body {
+    color: var(--color-text);
+
+    input {
+      background-color: var(--color-bg-alert-textbox);
+      border-color: var(--color-border-primary);
+    }
+
+    .add-on {
+      background-color: var(--color-bg-secondary);
+      text-shadow: none;
+      border-color: var(--color-border-primary);
+    }
+
+    border-color: var(--color-border-primary);
+  }
+
+  .modal-footer {
+    background-color: var(--color-bg-alert-buttons);
+    border-color: var(--color-border-primary);
+    box-shadow: none;
+
+    // .bb-submit is the login screen; bb-confirm-cancel is a popup (are you sure you want to delete tag)
+    .bb-submit, .bb-confirm-cancel {
+      background-color: var(--color-bg-alert-ok);
+      background-image: none;
+      &:hover, &:active {
+        background-color: var(--color-bg-alert-ok);
+        background-image: none;
+      }
+    }
+
+    // .bb-confirm-ok is a popup (are you sure you want to delete tag)
+    .bb-confirm-ok {
+      color: var(--color-text);
+      background-color: var(--color-bg-secondary);
+      background-image: none;
+      text-shadow: none;
+      border-color: var(--color-border-primary);
+      &:hover, &:active {
+        background-color: var(--color-bg-secondary);
+        background-image: none;
+      }
+    }
+  }
+}
+
+// Make scrollbars blend in with background
+::-webkit-scrollbar {
+  background: inherit;
 }

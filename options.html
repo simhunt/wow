@@ -2,7 +2,7 @@
   {{! expected data context: list of selected mechanics }}
   {{! nested element: label for dropdown }}
   <div class="bb-options-dropdown">
-    <a class="btn dropdown-toggle btn btn-small" data-toggle="dropdown" href="#">
+    <a class="btn dropdown-toggle btn btn-small btn-inverse" data-toggle="dropdown" href="#">
       <i class="fa fa-cog"></i>
       <span class="caret"></span>
     </a>
@@ -23,6 +23,12 @@
         <label class="checkbox bb-compact-mode">
           <input type="checkbox" id="bb-compact-mode" checked="{{compactMode}}">
           Compact mode
+        </label>
+      </a></li>
+      <li><a>
+        <label class="checkbox bb-dark-mode">
+          <input type="checkbox" id="bb-dark-mode" checked="{{darkMode}}">
+          Dark mode
         </label>
       </a></li>
     </ul>

@@ -14,6 +14,7 @@ html.fullHeight {
   }
   .bb-splitter > .bb-left-content, .bb-splitter iframe {
     width: 100%;
+    background-color: inherit;
   }
   #bb-body, #bb-content, .bb-puzzleround,
   .bb-splitter, .bb-splitter > div, .bb-splitter iframe,
@@ -24,6 +25,8 @@ html.fullHeight {
     width: 100%;
     padding-left: 0px; padding-right: 0px;
     .bb-splitter { /* vertical */
+      background-color: var(--color-bg-secondary);
+      color: var(--color-text);
       position: relative;
       display: flex;
       flex-direction: row;
@@ -36,8 +39,8 @@ html.fullHeight {
         padding-left: 2px; padding-right: 2px;
       }
       .bb-splitter-handle {
-        background: #ccc url('/img/vgrabber.gif') no-repeat center;
-        &:hover { background-color: #aaa; }
+        background: var(--color-border-primary) url('/img/vgrabber.gif') no-repeat center;
+        &:hover { background-color: var(--color-highlight-hover); }
       }
       & > .bb-splitter-handle {
         width: 6px;
@@ -48,7 +51,7 @@ html.fullHeight {
         }
       }
       &.active {
-        & > .bb-splitter-handle { background-color: #e88; }
+        & > .bb-splitter-handle { background-color: var(--color-highlight-active); }
         .bb-left-content, .bb-right-content { pointer-events: none; }
       }
       & > .bb-left-content { 
@@ -69,6 +72,7 @@ html.fullHeight {
       }
       /* horizontal splitter in right half */
       .bb-right-content {
+        background-color: var(--color-bg-secondary);
         position: absolute;
         right: 0px;
         width: var(--right-column);
@@ -89,15 +93,16 @@ html.fullHeight {
           bottom: 300px;
         }
         &.active {
-          .bb-splitter-handle { background-color: #e88; }
+          .bb-splitter-handle { background-color: var(--color-highlight-active); }
           .bb-top-right-content, .bb-bottom-right-content { pointer-events: none; }
         }
         .bb-bottom-right-content {
           position: absolute;
           right: 0; bottom: 0;
           /* chat stylin' */
-          background: url('/img/grid_noise.png');
-          background-attachment: fixed;
+          background: var(--color-bg-primary);
+          // background: url('/img/grid_noise.png');
+          // background-attachment: fixed;
           overflow: hidden;
           .bb-message-container, .bb-chat-messages { .border-box; }
           .bb-message-container {
@@ -114,19 +119,30 @@ html.fullHeight {
             position: absolute;
             left: 0; right: 0; margin-left: 0; margin-right: 0;
             bottom: 0; height: 36px;
-            background: url('/img/irongrip.png');
-            #messageInput { margin-top: 3px; }
+            // background: url('/img/irongrip.png');
+            background-color: var(--color-bg-topbar);
+            #messageInput { 
+              margin-top: 3px; 
+              // Change the color of the textbox to match the theme
+              background-color: var(--color-bg-secondary);
+              border-color: var(--color-border-primary);
+            }
           }
           .bb-chat-pop-out {
             position: absolute; top: 0; right: 14px;
-            background: white;
-            border: 1px solid #888;
+            background: var(--color-bg-dropdown);
+            border: 1px solid var(--color-border-primary);
             padding-left: 2px; padding-right: 4px;
             border-bottom-left-radius: 5px;
             &.in-margin {
               padding-top: 5px;
             }
           }
+        }
+        .label {
+          background: none;
+          color: var(--text-color);
+          text-shadow: none;
         }
       }
     }

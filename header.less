@@ -13,8 +13,9 @@
   }
   .navbar-inner, .bb-breadcrumbs .nav {
     pointer-events: auto;
-    background: url('/img/irongrip.png');
-    color: #c4c4c4;
+    // background: url('/img/irongrip.png');
+    // color: #c4c4c4;
+    background-color: var(--color-bg-topbar);
     strong,b {  color: #f5f5f5; }
     .messageRow, .actionRow, .bb-lastupdate {
       &, & .timestamp { color: #c4c4c4; }
@@ -70,6 +71,17 @@
             padding-right: 10px;
           }
         }
+        /* Make sure that tab styling is ok */
+        &.active {
+          background-color: var(--color-highlight-hover);
+        }
+        & > a {
+          background: none;
+          box-shadow: none; // NO BOX SHADOW. THIS IS IMPORTANT. -jenna
+          &.bb-close-puzzle {
+            background: none;
+          }
+        }
         & > a + a {
           padding-left: 0px;
           margin-left: -10px;
@@ -85,20 +97,25 @@
         }
         &.dropdown.open > ul.dropdown-menu {
           display: flex;
-          background: url('/img/irongrip.png');
-          color: #c4c4c4;
+          // background: url('/img/irongrip.png');
+          // color: #c4c4c4;
+          background-color: var(--color-bg-topbar);
           flex-flow: column nowrap;
           & > li {
             display: flex;
             flex-flow: row nowrap;
             color: #c4c4c4;
             a {
-              color: #c4c4c4;
-              &:hover { background: none; }
+              // color: #c4c4c4;
+              // &:hover { background: none; }
+              background: none;
             }
           }
         }
       }
+      // li.active {
+      //   background-color: var(--color-highlight-active);
+      // }
       & > .fill {
         flex-grow: 1;
         flex-shrink: 1;
@@ -114,13 +131,101 @@
   .bb-lastupdate, .bb-lastchat {
     /* add some subtle highlighting to tie the 'more' links to the
      * left-hand content */
+     background-color: inherit;
+     margin: 0;
+     height: 40px;
     &:hover {
-      background: rgba(0,0,0,0.1);
-      border-radius: 5px;
+      background: var(--color-highlight-hover);
     }
     width: 20%;
+    // Center the 'last updates'
+    .left {
+      line-height: 40px; // Same as the height: 40px 
+      background-color: inherit;
+    }
+    .left.label {
+      padding: 0px;
+      text-shadow: none;
+    }
+    .center {
+      line-height: 40px;
+    }
+    .right {
+      line-height: 40px;
+    }
   }
 }
+
+.bb-buttonbar {
+  text-align: right;
+  padding-right: 5px;
+  background-color: inherit;
+  height: 40px;
+  .btn-group { text-align: left; }
+  .btn-toolbar { margin-top: 0; margin-bottom: 0; }
+  .tooltip-inner {
+    color: #000;
+    background-color: #eee;
+    border-color: black;
+    border-style: solid;
+    border-width: 0 1px 1px 1px;
+  }
+  .tooltip.bottom .tooltip-arrow {
+    border-bottom-color: #eee;
+  }
+  /* tweak to fix up moving buttons when tooltip appears */
+  .bb-protect { 
+    margin-right: -1px;
+  }
+  .bb-unprotect { 
+    margin-left: 0;
+  }
+  /* highlights */
+  .bb-protect.active {
+    background-color: var(--color-highlight-active);
+  }
+  .bb-unprotect.active {
+    background-color: var(--color-highlight-active);
+  }
+}
+.bb-breadcrumbs .tooltip-inner { .bb-buttonbar .tooltip-inner; }
+.bb-breadcrumbs .tooltip.bottom .tooltip-arrow { .bb-buttonbar .tooltip.bottom .tooltip-arrow; }
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@left-size: 85px;
+@right-size: 45px;
+@vert-padding: 4px;
+.bb-lastchat, .bb-lastupdate {
+  margin-bottom: @vert-padding;
+  margin-top: @vert-padding;
+  padding: 0 (15px + @right-size) 0 (14px + @left-size);
+  & > .left { margin-left: (-@left-size); }
+  & > .right { margin-right: (-@right-size);
+               text-align: right;
+               a[title], a[data-original-title] { position:relative; }
+    .bb-pop-out { font-size: 80%; }
+  }
+  &, .messageRow { .ellipsis; }
+}
+.bb-lastchat .messageRow {
+  margin-top: 0;
+  margin-bottom: 0;
+  font: 90%;
+  line-height: 1.25;
+}
+.bb-lastchat > .right { line-height: 16px; }
+.bb-lastchat, .bb-lastupdate {
+  .timestamp { color: #555; }
+}
+.bb-lastupdate {
+  .comma-list { text-transform: uppercase; }
+}
+
 .bb-statuslight {
   line-height: 1;
   display: inline-block;
@@ -135,6 +240,14 @@
   .failed &, .offline & { --glyph: "\f057"; color: #F00; }
   .waiting & { --glyph: "\f110"; animation: fa-spin 2s infinite steps(8); color: #F80; }
 }
+
+ul.dropdown-menu {
+  background-color: var(--color-bg-secondary);
+  a {
+    color: var(--color-text);
+  }
+}
+
 #bb-body {
   .timestamp { font-size: .65em; }
 }
@@ -172,12 +285,45 @@ form#joinRoom {
 ul.typeahead { z-index: 1099; }
 
 /* fixup alertify styles */
+/* TODO(jenna): WHY ARE THESE IN THE HEADER FILE */
 #alertify {
- font-size: 16px;
- form { margin: 0; }
- #alertify-text { margin-bottom: 15px; }
- input { padding: 4px 6px; height: 100%; }
+  font-size: 16px;
+  form { margin: 0; }
+  #alertify-text { margin-bottom: 15px; }
+  input { padding: 4px 6px; height: 100%; }
+  background-color: var(--color-bg-dropdown);
+  color: var(--color-text);
+
+  .alertify-text {
+    background-color: var(--color-bg-alert-textbox);
+    border-color: var(--color-border-primary);
+  }
+
+  .alertify-buttons{
+    background-color: var(--color-bg-alert-buttons);
+    border-color: var(--color-border-primary);
+    box-shadow: none;
+
+    #alertify-cancel {
+      color: var(--color-text);
+      text-shadow: none;
+      background-color: var(--color-bg-secondary);
+      border-color: var(--color-border-primary);
+      background-image: none;
+    }
+
+    #alertify-ok {
+      background-color: var(--color-bg-alert-ok);
+    }
+  }
 }
 
 /* google picker */
 .picker.modal-dialog, .picker.modal-dialog-bg { z-index: 9999 !important; }
+
+/* Dark mode */
+.navbar {
+  i {
+    color: var(--color-navbar-icon);
+  }
+}
