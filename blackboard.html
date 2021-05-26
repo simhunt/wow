@@ -38,7 +38,7 @@
             </div>
           {{else if notificationsAsk}}
             <div class="btn-group text-left">
-              <button class="btn btn-small bb-notification-ask">
+              <button class="btn btn-small bb-notification-ask btn-inverse">
                 <i class="fas fa-power-off"></i>
                 Enable notifications
               </button>
@@ -46,13 +46,13 @@
           {{/if}}
           <div class="bb-sort-order">
             {{#unless sortReverse}}
-            <button class="btn btn-small"
+            <button class="btn btn-small btn-inverse"
                     data-sortReverse="true" title="Oldest rounds first">
               <i class="fas fa-clock"></i>
               <i class="fas fa-long-arrow-alt-up"></i>
             </button>
             {{else}}
-            <button class="btn btn-small"
+            <button class="btn btn-small btn-inverse"
                     data-sortReverse="false" title="Newest rounds first">
               <i class="fas fa-clock"></i>
               <i class="fas fa-long-arrow-alt-down"></i>
@@ -233,13 +233,13 @@
       </div>
       {{#if canEdit}}
         <div class="bb-puzzle-add-move" data-bbedit="puzzles/{{puzzle._id}}">
-        <button class="btn btn-link bb-add-tag"
+        <button class="btn btn-link btn-inverse bb-add-tag"
               title="Add tag to puzzle">
           <i class="fas fa-tags"></i>
           <i class="fas fa-plus"></i>
         </button>
-        <button class="btn btn-link bb-move-down"><i class="fas fa-arrow-down"></i></button>
-        <button class="btn btn-link bb-move-up"><i class="fas fa-arrow-up"></i></button>
+        <button class="btn btn-link btn-inverse bb-move-down"><i class="fas fa-arrow-down"></i></button>
+        <button class="btn btn-link btn-inverse bb-move-up"><i class="fas fa-arrow-up"></i></button>
         </div>
       {{/if}}
       {{#with puzzle}}
@@ -313,7 +313,7 @@
                   {{#each allMetas}}{{> blackboard_unfeed_meta puzzle=.. meta=this}}{{/each}}
                   {{#with unfedMetas}}{{#if this.count}}
                     <div class="btn-group bb-feed-meta">
-                      <button class="btn btn-small dropdown-toggle" data-toggle="dropdown">
+                      <button class="btn btn-small btn-inverse dropdown-toggle" data-toggle="dropdown">
                       Feed Meta <span class="caret"></span>
                       </button>
                       <ul class="dropdown-menu">
