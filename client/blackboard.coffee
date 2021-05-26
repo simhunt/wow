@@ -585,3 +585,48 @@ Meteor.startup ->
   Meteor.setInterval ->
     Session.set "currentTime", model.UTCNow()
   , 60*1000
+
+
+
+
+# unsolved_round_helper = ->
+#   dir = if 'true' is reactiveLocalStorage.getItem 'sortReverse' then 'desc' else 'asc'
+#   model.Rounds.find {solved: {$ne: null}}, sort: [["sort_key", dir]]
+# unsolved_meta_helper = ->
+#   r = for id, index in this.puzzles
+#     puzzle = model.Puzzles.findOne({_id: id, puzzles: {$ne: null}, solved: {$ne: null}})
+#     continue unless puzzle?
+#     {
+#       _id: id
+#       puzzle: puzzle
+#       num_puzzles: puzzle.puzzles.length
+#     }
+#   return r
+# unsolved_meta_and_unsolved_feeders = ->
+#   r = []
+#   console.log(this.puzzles)
+#   console.log(this)
+  # for id, index in this.puzzles
+  #   meta = model.Puzzles.findOne({_id: id, puzzles: {$ne: null}, solved: null})
+  #   if meta?
+  #     r.push({
+  #       _id: id
+  #       meta: meta
+  #       num_puzzles: meta.puzzles.length
+  #       #puzzles: for id, index in meta.puzzles
+  #       #  continue unless puzzle.solved is null
+  #     })
+  # console.log(r)
+  # return r
+
+# unassigned_helper = ->
+#   p = for id, index in this.puzzles
+#     puzzle = model.Puzzles.findOne({_id: id, feedsInto: {$size: 0}, puzzles: {$exists: false}})
+#     continue unless puzzle?
+#     { _id: id, puzzle: puzzle }
+#   editing = Meteor.userId() and (Session.get 'canEdit')
+#   hideSolved = 'true' is reactiveLocalStorage.getItem 'hideSolved'
+#   return p if editing or !hideSolved
+#   p.filter (pp) -> !pp.puzzle.solved?
+
+# Template.registerHelper 'suggestions', unsolved_meta_and_unsolved_feeders
