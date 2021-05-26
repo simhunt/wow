@@ -131,7 +131,7 @@ Meteor.startup ->
         round: civ._id
         link: 'https://www.mit.edu/~puzzle/2011/puzzles/civilization/puzzle_box/'
         tags: [ {name: 'Technology', value: 'Invention'}]
-        mechanics: ['video_game']
+        mechanics: ['video game']
       magic = Meteor.call 'newPuzzle',
         name: 'Sufficiently Advanced Technology'
         round: civ._id
@@ -147,7 +147,7 @@ Meteor.startup ->
         round: civ._id
         link: 'https://www.mit.edu/~puzzle/2011/puzzles/civilization/inventory_query/'
         tags: [ {name: 'Technology', value: 'Private Property'}]
-        mechanics: ['text_adventure']
+        mechanics: ['text adventure']
       laureate = Meteor.call 'newPuzzle',
         name: 'Laureate'
         round: civ._id
@@ -257,7 +257,7 @@ Meteor.startup ->
         round: emotions._id
         link: 'https://web.mit.edu/puzzle/www/2018/full/puzzle/freak_out.html'
         feedsInto: [fear._id]
-        mechanics: ['music_id']
+        mechanics: ['music id']
       Meteor.call 'newPuzzle',
         name: 'Let\'s Get Ready To Jumble'
         round: emotions._id
@@ -328,7 +328,7 @@ Meteor.startup ->
         link: 'https://web.mit.edu/puzzle/www/2018/full/puzzle/asteroids.html'
         feedsInto: [anger._id]
         tags: [{name: 'Temperature', value: '3'}]
-        mechanics: ['video_game']
+        mechanics: ['video game']
       Meteor.call 'newPuzzle',
         name: 'Good Fences Make Sad and Disgusted Neighbors'
         round: emotions._id
@@ -393,7 +393,7 @@ Meteor.startup ->
         link: 'https://web.mit.edu/puzzle/www/2018/full/puzzle/nobody_likes_sad_songs.html'
         feedsInto: [sadness._id]
         tags: [{name: 'Borders', value: '2'}]
-        mechanics: ['music_id']
+        mechanics: ['music id']
       Meteor.call 'newPuzzle',
         name: 'Irritating Places'
         round: emotions._id
