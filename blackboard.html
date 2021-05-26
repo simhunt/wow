@@ -2,6 +2,7 @@
   <!-- puzzles w/ index -->
   <div id="bb-blackboard" class="row-fluid">
     <div id="bb-sidebar" class="span2">
+      {{> bulletin_sidebar}} <!-- Relevant code located in sidebar.html, sidebar.coffee, sidebar.less -->
     </div>
     <div id="bb-tables" class="{{#if hideStatus}}span10{{else}}span8{{/if}} {{#if canEdit}}bb-canEdit{{/if}}">
       <!-- content div -->
@@ -79,18 +80,6 @@
           </tr>
           {{/unless}}
         </thead>
-        {{#let faves=favorites}}
-          {{#if faves.count}}
-            <tbody>
-              <tr><th colspan="{{nCols}}" id="favorites"><h2>Suggested for You</h2></th></tr>
-              {{#each faves}}
-                {{# unless solved }}
-                {{>blackboard_puzzle _id=_id puzzle=this}}
-                {{/unless}}
-              {{/each}}
-            </tbody>
-          {{/if}}
-        {{/let}}
         {{#each rounds}}
           {{> blackboard_round}}
         {{/each}}

@@ -1,0 +1,42 @@
+<template name="bulletin_sidebar">
+    <div class="bb-sidebar-content">
+        <h3>Puzzles for You</h3>
+        {{#if suggestions.length}}
+            {{#each suggestions}}
+                {{# unless solved }}
+                    {{> bulletin_puzzle _id=_id puzzle=this}}
+                {{/unless}}
+            {{/each}}
+        {{else}}
+            No recommendations yet! Try specifying some of your favorite mechanics.
+        {{/if}}
+    </div>
+</template>
+
+<template name="bulletin_puzzle">
+    <tr class="puzzle" data-puzzle-id="{{puzzle._id}}">
+      {{> bulletin_puzzle_content}}
+   </tr>
+</template>
+
+<template name="bulletin_puzzle_content">
+    {{link id=puzzle._id editing=canEdit}}
+    {{#if puzzle.link}}<a href="{{puzzle.link}}" title="Link to hunt site" target="_blank" style="margin-left: 5px;"><i class="fas fa-puzzle-piece"></i></a>{{/if}}
+    {{#with puzzle}}
+        {{#if mechanics.length}}
+            {{#each mechanics}}
+                {{#if mechanicName}} <!-- check for mechanics that have been removed -->
+                    <span class="mechanic-bubble {{#if yourFavoriteMechanic}}favorite-mechanic{{/if}}">{{mechanicName}}</span>
+                {{/if}}
+            {{/each}}
+        {{/if}}
+    {{/with}}
+    <ul>
+        {{#each puzzle.reasons}}
+            <li>{{this}}</li>
+        {{/each}}
+    </ul>
+    <button class="btn btn-small btn-inverse bb-later" data-id="{{puzzle._id}}">
+        later
+    </button>
+</template>
