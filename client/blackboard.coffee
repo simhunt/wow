@@ -82,11 +82,12 @@ Template.registerHelper 'compactMode', compactMode
 
 Template.blackboard.helpers
   sortReverse: -> 'true' is reactiveLocalStorage.getItem 'sortReverse'
-  hideSolved: -> 'true' is reactiveLocalStorage.getItem 'hideSolved'
-  hideSolvedMeta: -> 'true' is reactiveLocalStorage.getItem 'hideSolvedMeta'
-  hideStatus: -> 'true' is reactiveLocalStorage.getItem 'hideStatus'
-  # darkMode: -> 'true' is reactiveLocalStorage.getItem 'darkMode'
   whoseGitHub: -> settings.WHOSE_GITHUB
+
+# Make these properties global so that they can also be accessed by the options dropdown
+Template.registerHelper 'hideSolved', -> 'true' is reactiveLocalStorage.getItem 'hideSolved'
+Template.registerHelper 'hideSolvedMeta', -> 'true' is reactiveLocalStorage.getItem 'hideSolvedMeta'
+Template.registerHelper 'hideStatus', -> 'true' is reactiveLocalStorage.getItem 'hideStatus'
 
 # Notifications
 notificationStreams = [
