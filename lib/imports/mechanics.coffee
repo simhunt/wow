@@ -12,12 +12,12 @@ export class Mechanic
 
 new Mechanic 'audio manipulation'
 new Mechanic 'coding'
-new Mechanic 'crossword'
+new Mechanic 'crossword/wordplay'
 new Mechanic 'cryptic'
+new Mechanic 'duck konundrum'
 new Mechanic 'extraction'
 new Mechanic 'grunt work'
 new Mechanic 'ID task'
-new Mechanic 'linguistics'
 new Mechanic 'location-based/runaround'
 new Mechanic 'logic'
 new Mechanic 'math'
@@ -25,9 +25,9 @@ new Mechanic 'MIT knowledge'
 new Mechanic 'music'
 new Mechanic 'physical'
 new Mechanic 'sports'
+new Mechanic 'text adventure'
 new Mechanic 'TV and movie'
 new Mechanic 'video game'
-new Mechanic 'word stuff'
 
 Object.freeze mechanics
 
