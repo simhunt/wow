@@ -64,7 +64,7 @@ Meteor.startup ->
         round: civ._id
         link: 'https://www.mit.edu/~puzzle/2011/puzzles/civilization/drafting_table/'
         tags: [ {name: 'Technology', value: 'Draftsmanship'}]
-        mechanics: ['codeing']
+        mechanics: ['coding']
       racking = Meteor.call 'newPuzzle',
         name: 'Racking Your Brains'
         round: civ._id
