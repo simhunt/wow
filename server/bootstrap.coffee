@@ -47,7 +47,7 @@ Meteor.startup ->
         round: civ._id
         link: 'https://www.mit.edu/~puzzle/2011/puzzles/civilization/technological_crisis_at_shikakuro_farms/'
         tags: [ {name: 'Technology', value: 'Agriculture'}]
-        mechanics: ['nikoli']
+        mechanics: ['logic']
       charm = Meteor.call 'newPuzzle',
         name: 'Charm School'
         round: civ._id
@@ -58,13 +58,13 @@ Meteor.startup ->
         round: civ._id
         link: 'https://www.mit.edu/~puzzle/2011/puzzles/civilization/showcase/'
         tags: [ {name: 'Technology', value: 'Mathematics'}]
-        mechanics: ['runaround']
+        mechanics: ['location-based/runaround']
       drafting = Meteor.call 'newPuzzle',
         name: 'Drafting Table'
         round: civ._id
         link: 'https://www.mit.edu/~puzzle/2011/puzzles/civilization/drafting_table/'
         tags: [ {name: 'Technology', value: 'Draftsmanship'}]
-        mechanics: ['code']
+        mechanics: ['coding']
       racking = Meteor.call 'newPuzzle',
         name: 'Racking Your Brains'
         round: civ._id
@@ -153,7 +153,7 @@ Meteor.startup ->
         round: civ._id
         link: 'https://www.mit.edu/~puzzle/2011/puzzles/civilization/laureate/'
         tags: [ {name: 'Technology', value: 'Carbon Nanotubules'}]
-        mechanics: ['crossword', 'cryptic']
+        mechanics: ['crossword/wordplay', 'cryptic']
       princesses = Meteor.call 'newPuzzle',
         name: 'The Sport Of Princesses'
         round: civ._id
@@ -245,7 +245,7 @@ Meteor.startup ->
         round: emotions._id
         link: 'https://web.mit.edu/puzzle/www/2018/full/puzzle/clueless.html'
         feedsInto: [disgust._id]
-        mechanics: ['crossword', 'cryptic']
+        mechanics: ['crossword/wordplay', 'cryptic']
       Meteor.call 'newPuzzle',
         name: 'In Memoriam'
         round: emotions._id
@@ -257,7 +257,7 @@ Meteor.startup ->
         round: emotions._id
         link: 'https://web.mit.edu/puzzle/www/2018/full/puzzle/freak_out.html'
         feedsInto: [fear._id]
-        mechanics: ['music id']
+        mechanics: ['music']
       Meteor.call 'newPuzzle',
         name: 'Let\'s Get Ready To Jumble'
         round: emotions._id
@@ -280,14 +280,14 @@ Meteor.startup ->
         round: emotions._id
         link: 'https://web.mit.edu/puzzle/www/2018/full/puzzle/a_learning_path.html'
         feedsInto: [disgust._id, fear._id]
-        mechanics: ['nikoli']
+        mechanics: ['logic']
       Meteor.call 'newPuzzle',
         name: 'Cross Words'
         round: emotions._id
         link: 'https://web.mit.edu/puzzle/www/2018/full/puzzle/cross_words.html'
         feedsInto: [anger._id]
         tags: [{name: 'Temperature', value: '1'}]
-        mechanics: ['crossword']
+        mechanics: ['crossword/wordplay']
       Meteor.call 'newPuzzle',
         name: 'We Are All Afraid To Die'
         round: emotions._id
@@ -316,7 +316,7 @@ Meteor.startup ->
         link: 'https://web.mit.edu/puzzle/www/2018/full/puzzle/caged.html'
         feedsInto: [joy._id, sadness._id]
         tags: [{name: 'Borders', value: '5'}]
-        mechanics: ['crossword']
+        mechanics: ['crossword/wordplay']
       Meteor.call 'newPuzzle',
         name: 'Minority Report'
         round: emotions._id
@@ -335,7 +335,7 @@ Meteor.startup ->
         link: 'https://web.mit.edu/puzzle/www/2018/full/puzzle/good_fences_make_sad_and_disgusted_neighbors.html'
         feedsInto: [sadness._id, disgust._id]
         tags: [{name: 'Borders', value: '2'}]
-        mechanics: ['nikoli']
+        mechanics: ['logic']
       Meteor.call 'newPuzzle',
         name: 'Face Your Fears'
         round: emotions._id
@@ -363,7 +363,7 @@ Meteor.startup ->
         round: emotions._id
         link: 'https://web.mit.edu/puzzle/www/2018/full/puzzle/crossed_paths.html'
         feedsInto: [joy._id]
-        mechanics: ['crossword']
+        mechanics: ['crossword/wordplay']
       Meteor.call 'newPuzzle',
         name: 'On the A Line'
         round: emotions._id
@@ -393,7 +393,7 @@ Meteor.startup ->
         link: 'https://web.mit.edu/puzzle/www/2018/full/puzzle/nobody_likes_sad_songs.html'
         feedsInto: [sadness._id]
         tags: [{name: 'Borders', value: '2'}]
-        mechanics: ['music id']
+        mechanics: ['music']
       Meteor.call 'newPuzzle',
         name: 'Irritating Places'
         round: emotions._id
@@ -431,7 +431,7 @@ Meteor.startup ->
         name: 'The Brainstorm'
         round: emotions._id
         link: 'https://web.mit.edu/puzzle/www/2018/full/puzzle/the_brainstorm.html'
-        mechanics: ['runaround']
+        mechanics: ['location-based/runaround']
       
 
     console.log 'Done populating initial database.'
