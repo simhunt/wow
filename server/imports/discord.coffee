@@ -159,6 +159,8 @@ deleteVoiceChannel = (guild, name) ->
   mutex.acquire().then((release) ->
     await deleteChannel({name: name}, guild, 'voice')
     release()
+  ).catch((error) ->
+    console.warn 'Failed to delete channel ' + name
   )
   'ok'
 
