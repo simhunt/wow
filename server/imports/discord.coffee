@@ -37,10 +37,20 @@ apiThrottle = (base, name, params, options) ->
           await delay error.retry_after
           ix++
         else
-          return
-          console.warn "Rate limited; Will return after #{DELAYS[ix]}ms"
-          await delay DELAYS[ix]
-          ix++
+          throw error
+
+# Mutex-wrapping function
+doWithLock = (synchBlock, errorMsg) ->
+  mutex.acquire().then((release) ->
+    try
+      await synchBlock()
+    catch
+      console.warn errorMsg
+    finally
+      release() # Release the lock no matter what -- important!
+  ).catch((error) -> 
+    console.warn errorMsg
+  )
 
 # Maps round name to list of categories (1-to-many)
 roundNameToCategories = {}
@@ -96,15 +106,15 @@ getNonfullCategoryForRound = (guild, roundName) ->
 # adds a voice channel with name `name` to the round with name `roundName` in the guild `guild`
 newVoiceChannel = (guild, roundName, name) -> 
   self = this
-  mutex.acquire().then((release) ->
+  synchBlock = ->
     if getChannels(guild, {type: "voice", name: name, round: roundName}).length > 0
       console.warn "Voice channel #{name} in #{roundName} already exists."
       return
     categoryChannel = await getNonfullCategoryForRound(guild, roundName)
     newChannel = await apiThrottle guild.channels, 'create', name, {type: "voice", parent: categoryChannel}
     channelIdToRoundName[newChannel.id] = roundName
-    release()
-  )
+  errorMsg = "Failed to create voice channel $#{name} for round #{roundName}"
+  doWithLock synchBlock, errorMsg
   'ok'
 
 # 'private' (aka helper method - please hold mutex before calling)
@@ -115,15 +125,16 @@ deleteChannel = (identifier, guild, type) ->
     channel = identifier.channel 
   else 
     channel = getChannels(guild, {type: type, name: identifier.name})?[0]
-  # Perform deletion of channel in Discord
-  await apiThrottle channel, 'delete', "Puzzle solved!"
-  # Maintain rep invariants
-  roundName = channelIdToRoundName[channel.id]
-  unless roundName?
-    return 'ok'
-  # This channel ID no longer exists, so it doesn't have a round.
-  delete channelIdToRoundName[channel.id]
-  await handleEmptyCategories(guild, roundName)
+  if channel?
+    # Perform deletion of channel in Discord
+    await apiThrottle channel, 'delete', "Puzzle solved!"
+    # Maintain rep invariants
+    roundName = channelIdToRoundName[channel.id]
+    unless roundName?
+      return 'ok'
+    # This channel ID no longer exists, so it doesn't have a round.
+    delete channelIdToRoundName[channel.id]
+    await handleEmptyCategories(guild, roundName)
   'ok'
   
 
@@ -156,39 +167,40 @@ handleEmptyCategories = (guild, affectedRound) ->
 # 'public'
 # deletes the channel with name `name` from the guild `guild`
 deleteVoiceChannel = (guild, name) ->
-  mutex.acquire().then((release) ->
+  synchBlock = ->
     await deleteChannel({name: name}, guild, 'voice')
-    release()
-  ).catch((error) ->
-    console.warn 'Failed to delete channel ' + name
-  )
+  errorMsg = console.warn 'Failed to delete channel ' + name
+  doWithLock synchBlock, errorMsg
   'ok'
 
 # 'public'
 # deletes the channel with name `name` from the guild `guild`
 deleteVoiceChannelWithTimeout = (guild, name) ->
-  channel = null
-  mutex.acquire().then((release) ->
+  errorMsg = 'Voice channel with #{name} does not exist. Skipping deletion.'
+  renameAndWait = ->
+    channel = null
     channel = getChannels(guild, {type: 'voice', name: name})?[0]
     if channel?
       await apiThrottle channel, 'setName', "#{GREEN_CHECK}     #{name}"
-      release()
+
+      # Now that the channel has been renamed, set up the delete
       deleteAfterTimeout = () -> 
-        mutex.acquire().then((release) ->
-          await deleteChannel({channel: channel}, guild, 'voice')
-          release()
-        )
-      setTimeout deleteAfterTimeout, VOICE_CHANNEL_DELETE_DELAY
-    else
-      console.warn "Voice channel with #{name} does not exist. Skipping deletion."
-  )
+        await deleteChannel({channel: channel}, guild, 'voice')
+
+      lockedDelete = -> doWithLock deleteAfterTimeout, errorMsg
+
+      # Wait a bit before calling lockedDelete
+      setTimeout lockedDelete, VOICE_CHANNEL_DELETE_DELAY
+  
+  doWithLock renameAndWait, errorMsg
+
   'ok'
 
 # 'public'
 # renames a channel
 rename = (guild, oldName, newName) ->
   # We don't have to worry about duplication; that's handled before the call to this function in model.coffee
-  mutex.acquire().then((release) -> 
+  synchBlock ->
     newRoundNameToCategories = {}
     newChannelIdToRoundName = {}
     for roundName, categories of roundNameToCategories
@@ -210,22 +222,20 @@ rename = (guild, oldName, newName) ->
         await apiThrottle channel, 'setName', name.replace(oldName, newName)
     roundNameToCategories = newRoundNameToCategories
     channelIdToRoundName = newChannelIdToRoundName
-    release()
-  )
+  doWithLock synchBlock, "Could not rename channel #{oldName}"
   'ok'
 
 # 'public'
 # purges all channels in a guild
 # ONLY MEANT FOR DEVELPMENT / DEBUGGING. VERY DANGEROUS.
 purge = (guild) ->
-  mutex.acquire().then((release) ->
+  synchBlock ->
     channels = getChannels(guild)
     for channel in channels
       await deleteChannel({channel: channel}, guild, channel)
     roundNameToCategories = {}
     channelIdToRoundName = {}
-    release()
-  )
+  doWithLock synchBlock, ''
   'ok'
 
 export class DiscordBot

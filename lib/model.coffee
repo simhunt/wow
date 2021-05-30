@@ -975,7 +975,7 @@ spread_id_to_link = (id) ->
       deleteTagInternal updateDoc, 'provided'
       Puzzles.update id, updateDoc
       puzzle = Puzzles.findOne(id)
-      share.discordBot.newVoiceChannel(getRoundForPuzzle(id), puzzle.name)
+      share.discordBot.newVoiceChannel((Meteor.call 'getRoundForPuzzle', id).name, puzzle.name)
       oplog "Deleted answer for", 'puzzles', id, @userId
       return true
 
