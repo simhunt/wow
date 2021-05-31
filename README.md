@@ -101,6 +101,7 @@ Useful `mup` commands (all done from `.deploy` folder):
 
 ## Discord Integration
 
-To add DAPHNE to a new Discord server (aka guild), a member of the Simhunt Discord Developer Organization must visit `https://discord.com/api/oauth2/authorize?client_id=[CLIENT_ID]&scope=bot&permissions=8` in a browser and log in.
+To add DAPHNE to a new Discord server (aka guild), a member of the Simhunt Discord Developer Organization must visit `https://discord.com/api/oauth2/authorize?client_id=[CLIENT_ID]&permissions=8&scope=applications.commands%20bot` in a browser and log in.
  - `CLIENT_ID` is DAPHNE's application ID, which is found under General Information from the Bot Management page
  - `permissions=8` gives DAPHNE Administrator status in the guild. We could probably use narrower permissions, but I don't really see a reason to make things complicated.
+ - `scope=applications.commands%20bot` allows DAPHNE's developers to register slash commands for her. The `bot` part is there for reasons I don't understand. Discord API magic.

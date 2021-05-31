@@ -5,6 +5,7 @@ Discord = require('discord.js');
 import {Mutex, MutexInterface, Semaphore, SemaphoreInterface, withTimeout} from 'async-mutex';
 import delay from 'delay'
 import emojify from './emoji.coffee'
+model = share.model
 
 # Constants
 
@@ -228,6 +229,27 @@ purge = (guild) ->
   )
   'ok'
 
+ensureUser = (username) -> 
+  canonicalizedUsername = model.canonical username 
+  user = Meteor.users.findOne({_id: canonicalizedUsername})
+  unless user?
+    user = Meteor.users.insert({
+      _id: canonicalizedUsername
+      nickname: canonicalizedUsername
+    })
+  return user
+
+slashAdd = (puzzleName, roundName) ->
+  round = model.Rounds.findOne({name: roundName})
+  if round?
+    model.newPuzzle {name: puzzleName, round: round._id}
+
+slashSolve = (username, puzzleName, answer) ->
+  user = model.Users.findOne({name: userName})
+  unless user?
+    user = model.Users.
+  model.setAnswer puzzleName 
+    
 export class DiscordBot
   constructor: (guildName, discordToken) ->
     @discordToken = discordToken

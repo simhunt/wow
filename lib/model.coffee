@@ -1059,3 +1059,6 @@ share.model =
   drive_id_to_link: drive_id_to_link
   spread_id_to_link: spread_id_to_link
   UTCNow: UTCNow
+  # methods for Discord integration to call
+  slashNewPuzzle: slashNewPuzzle
+  slashSetAnswer: slashSetAnswer
