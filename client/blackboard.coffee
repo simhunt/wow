@@ -259,9 +259,23 @@ Template.blackboard.events
       Meteor.call 'newPuzzle', { name: str, round: @_id }, (error,r)->
         throw error if error
   "click .bb-round-buttons .bb-add-meta": (event, template) ->
-    alertify.prompt "Name of new metapuzzle:", (e,str) =>
+    # Create HTML to stick into the alertify prompt--sorry for the hack
+    alertboxString = 'Name of metapuzzle: </p>' +
+    '<p style="padding-left: 15px">Assign unassigned puzzles to this: ' +
+    '<input checked type="checkbox" style="padding:none;height:12px" id="assign-to-meta">'
+    
+    alertify.prompt alertboxString, (e,str) =>
       return unless e # bail if cancelled
-      Meteor.call 'newPuzzle', { name: str, round: @_id, puzzles: [] }, (error,r)->
+      # If the 'assign to meta' box is checked, populate the 'puzzles' argument with the string IDs
+      # of the unassigned puzzles in the round 
+      assignToMeta = document.getElementById('assign-to-meta').checked
+      puzzles = []
+      if assignToMeta
+        for id, index in this.puzzles
+          p = model.Puzzles.findOne({_id: id, feedsInto: {$size: 0}, puzzles: {$exists: false}})
+          if p?
+            puzzles.push(p._id)
+      Meteor.call 'newPuzzle', { name: str, round: @_id, puzzles: puzzles }, (error,r)->
         throw error if error
   "click .bb-round-buttons .bb-add-tag": (event, template) ->
     alertify.prompt "Name of new tag:", (e,str) =>
