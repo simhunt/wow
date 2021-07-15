@@ -102,7 +102,7 @@ Useful `mup` commands (all done from `.deploy` folder):
 ### Deployment to Meteor Cloud (Meteor Free Deploy)
 
 Alternatively, WOW can be deployed like all [Meteor 2.0+](https://blog.meteor.com/meteor-2-0-is-here-867b0ab4f8df) apps using Meteor free deploy. Simply run:
-- `meteor deploy myapp.meteorapp.com --free --mongo`
+- `meteor deploy myapp.meteorapp.com --free --mongo --settings pathto/settings.json`
 And your instance should launching using Galaxy, the hosting offer inside Meteor cloud.
 
 ## Discord Integration
