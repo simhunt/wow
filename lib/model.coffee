@@ -190,6 +190,14 @@ if Meteor.isServer
   Presence._ensureIndex {timestamp:-1}, {}
   Presence._ensureIndex {present:1, room_name:1}, {}
 
+# Whiteboard message
+#    There should only be one of these.
+#    timestamp: timestamp of last update
+#    content: Markdown content
+Whiteboard = BBCollection.whiteboard = new Mongo.Collection "whiteboard"
+if Meteor.isServer
+  Whiteboard._ensureIndex {timestamp:1}, {}
+
 # this reverses the name given to Mongo.Collection; that is the
 # 'type' argument is the name of a server-side Mongo collection.
 collection = (type) ->
@@ -208,7 +216,7 @@ drive_id_to_link = (id) ->
   "https://docs.google.com/folder/d/#{id}/edit"
 spread_id_to_link = (id) ->
   "https://docs.google.com/spreadsheets/d/#{id}/edit"
-
+    
 (->
   # private helpers, not exported
   unimplemented = -> throw new Meteor.Error(500, "Unimplemented")
@@ -1033,6 +1041,13 @@ spread_id_to_link = (id) ->
       # check email, NonEmptyString
       share.drive.shareFolder email
 
+    whiteboardSubmit: (content) ->
+      if Meteor.isServer
+        whiteboardColl = collection('whiteboard')
+        whiteboard = whiteboardColl.findOne({}, { sort: { timestamp: -1 } }) or whiteboardColl.insert {}
+        whiteboardColl.update {_id: whiteboard._id}, $set:
+          content: content # potential danger zone?
+          timestamp: Date.now()
 )()
 
 UTCNow = -> Date.now()
@@ -1050,6 +1065,7 @@ share.model =
   Messages: Messages
   LastRead: LastRead
   Presence: Presence
+  Whiteboard: Whiteboard
   # helper methods
   collection: collection
   pretty_collection: pretty_collection

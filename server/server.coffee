@@ -194,3 +194,8 @@ Meteor.publish 'all-names', loginRequired ->
 
 ## Publish the 'facts' collection to all users
 Facts.setUserIdFilter -> true
+
+# Publish whiteboard updates
+Meteor.publish 'whiteboard', loginRequired -> [
+  model.Whiteboard.find()
+]

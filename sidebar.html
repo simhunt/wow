@@ -1,18 +1,43 @@
 <template name="bulletin_sidebar">
     <div class="bb-sidebar-content">
-        <h3>Puzzles for You</h3>
-        {{#if suggestions.length}}
-            {{#each suggestions}}
-                {{# unless solved }}
-                    {{> bulletin_puzzle _id=_id puzzle=this}}
-                {{/unless}}
-            {{/each}}
-        {{else}}
-            No recommendations yet! Try specifying some of your favorite mechanics.
-        {{/if}}
+        <div class="bb-sidebar-box">
+            {{> whiteboard}}
+        </div>
+        <div class="bb-sidebar-box">
+            <h3>Puzzles for You</h3>
+            {{#if suggestions.length}}
+                {{#each suggestions}}
+                    {{# unless solved }}
+                        {{> bulletin_puzzle _id=_id puzzle=this}}
+                    {{/unless}}
+                {{/each}}
+            {{else}}
+                No recommendations yet! Try specifying some of your favorite mechanics.
+            {{/if}}
+        </div>
     </div>
 </template>
 
+<!-- Whiteboard-specific templates -->
+<template name="whiteboard">
+    <h3>Whiteboard</h3>
+    {{#if whiteboardEditing}}
+        {{> whiteboard_textbox text=whiteboardMd}}
+    {{else}}
+        <div id="whiteboard-content" class="whiteboard-content">{{{whiteboardHtml}}}</div>
+        <div id="whiteboard-timestamp">{{whiteboardTimeDisplay}}</div>
+    {{/if}}
+</template>
+
+<!-- Needs its own onRender function -->
+<template name="whiteboard_textbox">
+    <textarea 
+        id="whiteboard-textbox" 
+        class="whiteboard-textbox"
+        autofocus="true">{{this.text}}</textarea> <!-- No extra spaces here! -->
+</template>
+
+<!-- Puzzle-suggestion-specific templates -->
 <template name="bulletin_puzzle">
     <tr class="puzzle" data-puzzle-id="{{puzzle._id}}">
       {{> bulletin_puzzle_content}}
