@@ -7,9 +7,7 @@ import { reactiveLocalStorage } from './imports/storage.coffee'
 import sanitizeHtml from 'sanitize-html';
 import { createMarkdown } from 'safe-marked'
 markdown = createMarkdown()
-defaultMd = 'Nothing here yet! Type a message.
-*Markdown* is **supported**.
-<b>HTML</b> is <i>not</i>.'
+defaultMd = 'Welcome to Simhunt!'
 
 # Import time library
 import TimeAgo from 'javascript-time-ago'
