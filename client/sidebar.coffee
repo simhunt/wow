@@ -3,8 +3,55 @@
 # Import a bunch of stuff. This isn't really getting used right now, but hey. Maybe someday.
 import { reactiveLocalStorage } from './imports/storage.coffee'
 
+# Import all the stuff we need to use markdown
+import sanitizeHtml from 'sanitize-html';
+import { createMarkdown } from 'safe-marked'
+markdown = createMarkdown()
+defaultMd = 'Welcome to Simhunt!'
+
+# Import time library
+import TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en.json'
+TimeAgo.addDefaultLocale(en)
+timeAgo = new TimeAgo('en-US')
+
 model = share.model # import
 settings = share.settings # import
+
+# --- Whiteboard ---
+isWhiteboardEditing = ReactiveVar(false);
+whiteboardEditing = -> isWhiteboardEditing.get()
+
+# Helper function to escape and sanitize all HTML
+sanitizeAllHtml = (content) ->
+  sanitizeHtml(content, 
+      { allowedTags: [], allowedAttributes: {}, disallowedTagsMode: 'recursiveEscape' }).trim()
+
+# Simple getter methods
+whiteboardMd = ->
+  whiteboard = model.Whiteboard.findOne({}, { sort: { timestamp: -1 } })
+  content = if whiteboard? then (whiteboard.content or defaultMd) else defaultMd
+  return sanitizeAllHtml(content).trim()
+whiteboardHtml = ->
+  markdown(whiteboardMd())
+
+# Time display
+timeDisplay = ReactiveVar()
+updateTimeDisplay = -> 
+  whiteboard = model.Whiteboard.findOne({}, { sort: { timestamp: -1 } })
+  if whiteboard? 
+    timeDisplay.set('Last updated ' + timeAgo.format(whiteboard.timestamp))
+  else
+    timeDisplay.set('Never updated')
+whiteboardTimeDisplay = ->
+  timeDisplay.get()
+  
+
+# Setter method
+whiteboardSubmit = (content) ->
+  Meteor.call 'whiteboardSubmit', sanitizeAllHtml(content)
+
+# --- Puzzles for You ---
 
 # Needed to show tags for mechanics. Copied from blackboard.coffee.
 tagHelper = ->
@@ -140,9 +187,39 @@ suggestions = ->
   num_to_show = 3
   return all_suggestions.slice(0, num_to_show)
 
-# The overall sidebar needs to know what the suggestions are.
+# -- Entire-sidebar template functions --
 Template.bulletin_sidebar.helpers
-  suggestions: suggestions
+  suggestions: suggestions # The overall sidebar needs to know what the suggestions are.
+
+# -- Whiteboard-specific template functions --
+Template.whiteboard.onCreated -> this.autorun =>
+  this.subscribe 'whiteboard'
+  updateTimeDisplay() # Initialize timer
+  Meteor.setInterval(updateTimeDisplay, 1*60*1000) # Update timer every 1 minute
+
+Template.whiteboard.helpers
+  whiteboardEditing: whiteboardEditing
+  whiteboardHtml: whiteboardHtml
+  whiteboardMd: whiteboardMd
+  whiteboardTimeDisplay: whiteboardTimeDisplay
+
+Template.whiteboard.events
+  'click .whiteboard-content': (event, template) ->
+    isWhiteboardEditing.set(true)
+
+  'blur textarea': (event, template) ->
+    value = document.getElementById('whiteboard-textbox').value
+    whiteboardSubmit(value)
+    isWhiteboardEditing.set(false)
+
+# Needed to adjust height on textbox
+Template.whiteboard_textbox.onRendered ->
+  textbox = document.getElementById('whiteboard-textbox')
+  if textbox? 
+    textbox.style.height = textbox.scrollHeight + 'px'
+
+
+# -- Puzzle-suggestion-specific template functions --
 
 # Individual puzzles in the bulletin have to know their tags.
 Template.bulletin_puzzle.helpers
