@@ -10,6 +10,7 @@ export class Mechanic
     mechanics[@canon] = @
     Object.freeze @
 
+new Mechanic 'all hands (swarm)'
 new Mechanic 'audio manipulation'
 new Mechanic 'coding'
 new Mechanic 'crossword/wordplay'

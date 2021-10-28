@@ -52,7 +52,8 @@ whiteboardSubmit = (content) ->
   Meteor.call 'whiteboardSubmit', sanitizeAllHtml(content)
 
 # --- Puzzles for You ---
-
+allhands_tag = 'all hands (swarm)'
+  
 # Needed to show tags for mechanics. Copied from blackboard.coffee.
 tagHelper = ->
   isRound = not ('feedsInto' of this)
@@ -75,13 +76,17 @@ getDefaultZero = (map, key) ->
 
 # Gets puzzles with one of this user's favorite mechanics. Stolen from blackboard.coffee.
 favorites = ->
-    query = $or: [
-      {"favorites.#{Meteor.userId()}": true},
-      mechanics: $in: Meteor.user().favorite_mechanics or []
-    ]
-    if not Session.get('canEdit') and 'true' is reactiveLocalStorage.getItem 'hideSolved'
-      query.solved = $eq: null
-    model.Puzzles.find query
+  query = $or: [
+    {"favorites.#{Meteor.userId()}": true},
+    mechanics: $in: Meteor.user().favorite_mechanics or []
+  ]
+  if not Session.get('canEdit') and 'true' is reactiveLocalStorage.getItem 'hideSolved'
+    query.solved = $eq: null
+  model.Puzzles.find query
+
+# Does this user have allhands enabled?
+is_subscribed_allhands = ->
+  allhands_tag in Meteor.user().favorite_mechanics
 
 # Keep track of how many times someone hit 'later' on a puzzle.
 # This needs to be a ReactiveVar so that the sidebar updates when the user clicks 'later'.
@@ -132,6 +137,19 @@ suggestions = ->
     )
   )
 
+  # Get puzzles with the 'all hands' tag.
+  allhands_message = 'Calling all teammates to work on this puzzle together!'
+
+  faves = favorites()
+  allhands = []
+  not_allhands_faves = []
+  faves.forEach((fave) ->
+    if allhands_tag in fave.mechanics and is_subscribed_allhands()
+      allhands.push(fave)
+    not_allhands_faves.push(fave)
+  )
+  addReason(allhands, allhands_message)
+
   # Get "close metas" and their feeders.
   close_meta_thresh = 3
   close_meta_message = 'This meta is unsolved, but almost all its feeders are solved.'
@@ -140,7 +158,7 @@ suggestions = ->
   close_metas = unsolved_metas
       .filter((meta) -> meta.puzzles.reduce(((acc, cur) -> if cur.solved is null then acc + 1 else acc), 0) >= meta.puzzles.length - close_meta_thresh)
       .map((meta) -> Object.assign({reasons: [close_meta_message]}, meta))
-  close_metas.forEach((meta) -> ids_to_data[meta._id] = meta)
+  addReason(close_metas, close_meta_message)
   
   unsolved_puzzles_in_close_metas = close_metas
     .flatMap((meta) -> meta.puzzles).map((id) -> model.Puzzles.findOne({_id: id, solved: null})).filter((puzzle) -> puzzle?)
@@ -173,9 +191,7 @@ suggestions = ->
 
   # Get favorite mechanics.
   fave_message = 'This puzzle uses one of your favorite mechanics.'
-
-  faves = favorites()
-  addReason(faves, fave_message)
+  addReason(not_allhands_faves, fave_message)
 
   # Now get all the suggestions and sort them by number of passes (fewer passes go on top).
   all_suggestions = (data for own id, data of ids_to_data)

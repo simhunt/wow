@@ -46,16 +46,18 @@
 
 <template name="bulletin_puzzle_content">
     {{link id=puzzle._id editing=canEdit}}
-    {{#if puzzle.link}}<a href="{{puzzle.link}}" title="Link to hunt site" target="_blank" style="margin-left: 5px;"><i class="fas fa-puzzle-piece"></i></a>{{/if}}
-    {{#with puzzle}}
-        {{#if mechanics.length}}
-            {{#each mechanics}}
-                {{#if mechanicName}} <!-- check for mechanics that have been removed -->
-                    <span class="mechanic-bubble {{#if yourFavoriteMechanic}}favorite-mechanic{{/if}}">{{mechanicName}}</span>
-                {{/if}}
-            {{/each}}
-        {{/if}}
-    {{/with}}
+    <div class="puzzle-and-mechanics">
+        {{#if puzzle.link}}<a href="{{puzzle.link}}" title="Link to hunt site" target="_blank" style="margin-left: 5px;"><i class="fas fa-puzzle-piece"></i></a>{{/if}}
+        {{#with puzzle}}
+            {{#if mechanics.length}}
+                {{#each mechanics}}
+                    {{#if mechanicName}} <!-- check for mechanics that have been removed -->
+                        <span class="mechanic-bubble {{#if yourFavoriteMechanic}}favorite-mechanic{{/if}}">{{mechanicName}}</span>
+                    {{/if}}
+                {{/each}}
+            {{/if}}
+        {{/with}}
+    </div>
     <ul>
         {{#each puzzle.reasons}}
             <li>{{this}}</li>
