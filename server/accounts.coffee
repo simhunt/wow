@@ -30,6 +30,7 @@ Accounts.registerLoginHandler 'codex', (options) ->
       _id: canon
       bot_wakeup: $exists: false
     , $set: profile
+    Meteor.users.update canon, $addToSet: favorite_mechanics: 'all hands (swarm)'
   catch error
     throw new Meteor.Error 401, 'Can\'t impersonate the bot'
 
