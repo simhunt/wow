@@ -74,12 +74,20 @@ getDefaultZero = (map, key) ->
     return map[key]
   return 0
 
-# Gets puzzles with one of this user's favorite mechanics. Stolen from blackboard.coffee.
+# Gets puzzles with one of this user's favorite mechanics, besides allhands. 
+# Modified from blackboard.coffee.
 favorites = ->
   query = $or: [
     {"favorites.#{Meteor.userId()}": true},
-    mechanics: $in: Meteor.user().favorite_mechanics or []
+    mechanics: $in: Meteor.user().favorite_mechanics.filter((m) -> m != allhands_tag) or []
   ]
+  if not Session.get('canEdit') and 'true' is reactiveLocalStorage.getItem 'hideSolved'
+    query.solved = $eq: null
+  model.Puzzles.find query
+
+# Gets puzzles with the allhands tag.
+allhands_puzzles = ->
+  query = {mechanics: allhands_tag}
   if not Session.get('canEdit') and 'true' is reactiveLocalStorage.getItem 'hideSolved'
     query.solved = $eq: null
   model.Puzzles.find query
@@ -139,16 +147,8 @@ suggestions = ->
 
   # Get puzzles with the 'all hands' tag.
   allhands_message = 'Calling all teammates to work on this puzzle together!'
-
-  faves = favorites()
-  allhands = []
-  not_allhands_faves = []
-  faves.forEach((fave) ->
-    if allhands_tag in fave.mechanics and is_subscribed_allhands()
-      allhands.push(fave)
-    not_allhands_faves.push(fave)
-  )
-  addReason(allhands, allhands_message)
+  if is_subscribed_allhands
+    addReason(allhands_puzzles(), allhands_message)
 
   # Get "close metas" and their feeders.
   close_meta_thresh = 3
@@ -191,7 +191,7 @@ suggestions = ->
 
   # Get favorite mechanics.
   fave_message = 'This puzzle uses one of your favorite mechanics.'
-  addReason(not_allhands_faves, fave_message)
+  addReason(favorites(), fave_message)
 
   # Now get all the suggestions and sort them by number of passes (fewer passes go on top).
   all_suggestions = (data for own id, data of ids_to_data)

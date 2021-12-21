@@ -1005,6 +1005,10 @@ spread_id_to_link = (id) ->
       check @userId, NonEmptyString
       check puzzle, NonEmptyString
       check mechanic, IsMechanic
+      if mechanic == 'all hands (swarm)'
+        puzzleDbObj = Puzzles.findOne puzzle
+        roundName = (Meteor.call 'getRoundForPuzzle', puzzle).name or 'No round'
+        share.discordBot.swarmNotify({id: puzzle, name: puzzleDbObj.name, mechanics: puzzleDbObj.mechanics, round: roundName})
       num = Puzzles.update puzzle,
         $addToSet: mechanics: mechanic
         $set:
@@ -1016,6 +1020,8 @@ spread_id_to_link = (id) ->
       check @userId, NonEmptyString
       check puzzle, NonEmptyString
       check mechanic, IsMechanic
+      if mechanic == 'all hands (swarm)'
+        share.discordBot.swarmStop(puzzle)
       num = Puzzles.update puzzle,
         $pull: mechanics: mechanic
         $set:

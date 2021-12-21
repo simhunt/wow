@@ -11,7 +11,8 @@ if Meteor.isAppTest
 Promise.await do ->
   try
     if Meteor.settings.discordServerName? && Meteor.settings.discordToken?
-      share.discordBot = new DiscordBot(Meteor.settings.discordServerName, Meteor.settings.discordToken)
+      share.discordBot = new DiscordBot(Meteor.settings.discordServerName, 
+        Meteor.settings.discordSwarmChannel, Meteor.settings.discordToken)
     else
       share.discordBot = new FailDiscordBot
       console.warn "Please provide a discord server name and bot token. Discord integration disabled."

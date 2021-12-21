@@ -57,6 +57,9 @@ roundNameToCategories = {}
 # Maps channel ID to round name (1-to-1)
 channelIdToRoundName = {}
 
+# Maps puzzle ID to swarm message object
+puzzleIdToSwarmMessage = {}
+
 # Function definitions
 
 # query has type, name, round
@@ -200,7 +203,7 @@ deleteVoiceChannelWithTimeout = (guild, name) ->
 # renames a channel
 rename = (guild, oldName, newName) ->
   # We don't have to worry about duplication; that's handled before the call to this function in model.coffee
-  synchBlock ->
+  synchBlock = ->
     newRoundNameToCategories = {}
     newChannelIdToRoundName = {}
     for roundName, categories of roundNameToCategories
@@ -226,10 +229,44 @@ rename = (guild, oldName, newName) ->
   'ok'
 
 # 'public'
+# notifies @here about a swarm
+# puzzleObj has fields:
+#  - id: the puzzle ID
+#  - name: the puzzle name
+#  - mechanics: the list of mechanics tags associated with the puzzle
+#  - round: the round name of the puzzle
+swarmNotify = (guild, swarmChannel, puzzleObj) ->
+  synchBlock = ->
+    if swarmChannel?
+      mechanicsList = puzzleObj.mechanics.filter((m) -> m != 'all hands (swarm)')
+      messageText = """@here Calling all teammates to work on this puzzle together!
+
+Name: **#{puzzleObj.name}**
+Round: #{puzzleObj.round}"""
+      if mechanicsList.length > 0
+        messageText += '\n' + "Mechanics: #{mechanicsList.join(', ')}"
+      message = await swarmChannel.send(messageText)
+      puzzleIdToSwarmMessage[puzzleObj.id] = message
+  doWithLock synchBlock, "Failed to notify about swarm on puzzle #{puzzleObj.name}"
+  'ok'
+
+# 'public'
+# removes an @here swarm notification (if DAPHNE goes down, this won't work for any @here-s before crash)
+# puzzleId is just an ID, not an object
+swarmStop = (guild, swarmChannel, puzzleId) ->
+  synchBlock = ->
+    if swarmChannel?
+      message = puzzleIdToSwarmMessage[puzzleId]
+      if message?
+        await message.delete()
+  doWithLock synchBlock, "Failed to delete swarm on puzzle ID #{puzzleId}"
+  'ok'
+
+# 'public'
 # purges all channels in a guild
 # ONLY MEANT FOR DEVELPMENT / DEBUGGING. VERY DANGEROUS.
 purge = (guild) ->
-  synchBlock ->
+  synchBlock = ->
     channels = getChannels(guild)
     for channel in channels
       await deleteChannel({channel: channel}, guild, channel)
@@ -239,7 +276,7 @@ purge = (guild) ->
   'ok'
 
 export class DiscordBot
-  constructor: (guildName, discordToken) ->
+  constructor: (guildName, swarmChannel, discordToken) ->
     @discordToken = discordToken
     @client = new Discord.Client()
     # Need to be able to access 'this' from inside the onReady function
@@ -271,6 +308,10 @@ export class DiscordBot
           else
             roundNameToCategories[baseName] = [channel]
           channelIdToRoundName[channel.id] = baseName
+        # Fetch swarm channel
+        # Need string comparison because these numbers are really big
+        if Number.toString(snowflake) == Number.toString(swarmChannel) 
+          self.swarmChannel = channel
       )
       for roundName, channelList of roundNameToCategories
         channelList.sort()
@@ -287,6 +328,8 @@ export class DiscordBot
   deleteVoiceChannel: (name) -> deleteVoiceChannel(@guild, name)
   deleteVoiceChannelWithTimeout: (name) -> deleteVoiceChannelWithTimeout(@guild, name)
   rename: (oldName, newName) -> rename(@guild, oldName, newName)
+  swarmNotify: (puzzleObj) -> swarmNotify(@guild, @swarmChannel, puzzleObj)
+  swarmStop: (puzzleId) -> swarmStop(@guild, @swarmChannel, puzzleId)
   purge: -> purge(@guild)
   
         
@@ -297,4 +340,6 @@ export class FailDiscordBot
   deleteVoiceChannel: skip 'deleteChannel'
   deleteVoiceChannelWithTimeout: skip 'deleteVoiceChannelWithTimeout'
   rename: skip 'rename'
+  swarmNotify: skip 'swarmNotify'
+  swarmStop: skip 'swarmStop'
   purge: skip 'purge'

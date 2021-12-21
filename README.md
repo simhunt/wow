@@ -29,6 +29,7 @@ The settings.json file has the following structure:
     			as a template to create other spreadsheets,
     "discordToken": the token for a Discord bot,
     "discordServerName": the server name that the Discord bot should listen to,
+    "discordSwarmChannel": (AS A STRING, NOT A NUMBER) the ID of a channel, in the server with `discordServerName`, that should be used to notify hunters of which puzzles currently have an `all hands (swarm)` tag,
     "teampassword": the password that people who visit the app must enter to use it
 }
 ```
