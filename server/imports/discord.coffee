@@ -9,12 +9,13 @@ import emojify from './emoji.coffee'
 # Constants
 
 # Things that are true no matter what
+MIN_TO_S = 60
 S_TO_MS = 1000
 GREEN_CHECK = emojify(":white_check_mark:")
 MAX_CHANNELS_IN_CATEGORY = 50
 
 # Parameters (can be changed according to preference)
-VOICE_CHANNEL_DELETE_DELAY = 10 * S_TO_MS
+VOICE_CHANNEL_DELETE_DELAY = 10 * MIN_TO_S * S_TO_MS
 DELAYS = [100, 250, 500, 1000, 2000, 5000, 10000]
 
 # Ensure mutual exclusion
@@ -49,6 +50,7 @@ doWithLock = (synchBlock, errorMsg) ->
     finally
       release() # Release the lock no matter what -- important!
   ).catch((error) -> 
+    console.warn error
     console.warn errorMsg
   )
 
@@ -245,7 +247,7 @@ Name: **#{puzzleObj.name}**
 Round: #{puzzleObj.round}"""
       if mechanicsList.length > 0
         messageText += '\n' + "Mechanics: #{mechanicsList.join(', ')}"
-      message = await swarmChannel.send(messageText)
+      message = await apiThrottle swarmChannel, 'send', messageText
       puzzleIdToSwarmMessage[puzzleObj.id] = message
   doWithLock synchBlock, "Failed to notify about swarm on puzzle #{puzzleObj.name}"
   'ok'
@@ -258,7 +260,7 @@ swarmStop = (guild, swarmChannel, puzzleId) ->
     if swarmChannel?
       message = puzzleIdToSwarmMessage[puzzleId]
       if message?
-        await message.delete()
+        await apiThrottle message, 'delete'
   doWithLock synchBlock, "Failed to delete swarm on puzzle ID #{puzzleId}"
   'ok'
 
@@ -310,9 +312,11 @@ export class DiscordBot
           channelIdToRoundName[channel.id] = baseName
         # Fetch swarm channel
         # Need string comparison because these numbers are really big
-        if Number.toString(snowflake) == Number.toString(swarmChannel) 
+        if "#{snowflake}" == swarmChannel
           self.swarmChannel = channel
       )
+      if self.swarmChannel?
+        console.log("DAPHNE is using #{swarmChannel} as a swarm channel!")
       for roundName, channelList of roundNameToCategories
         channelList.sort()
       # Associate each non-category channel to a round
