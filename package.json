@@ -15,7 +15,7 @@
     "googleapis": "^40.0.0",
     "hubot": "^3.3.2",
     "hubot-help": "^1.0.1",
-    "javascript-time-ago": "^2.3.9",
+    "javascript-time-ago": "^2.5.9",
     "mail-listener5": "^2.0.0",
     "meteor-node-stubs": "^0.4.1",
     "node-random-name": "^1.0.1",
