@@ -30,6 +30,12 @@ function onGoogleApiLoad() {
       {{> header_nickmodal_contents}}
     </div>
   {{/if}}
+  <!-- very important section that needs to be on every page -->
+  <div class="celebration {{#unless celebrationNeeded}}hidden{{/unless}}">
+    <div class="inner">
+      <img src="/img/CLIPLY_372109170_FREE_FIREWORKS_1000.gif" title="Celebration" class="img-responsive center-block"/>
+    </div>
+  </div>
 </body>
 
 <template name="page">

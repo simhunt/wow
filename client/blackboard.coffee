@@ -13,19 +13,6 @@ SOUND_THRESHOLD_MS = 30*1000 # 30 seconds
 blackboard = {} # store page global state
 
 Meteor.startup ->
-  # note that this observe 'leaks' -- we're not setting it up/tearing it
-  # down with the blackboard page, we're going to play the sound whatever
-  # page the user is currently on.  This is "fun".  Trust us...
-  Meteor.subscribe 'last-answered-puzzle'
-  # ignore added; that's just the startup state.  Watch 'changed'
-  model.LastAnswer.find({}).observe
-    changed: (doc, oldDoc) ->
-      return unless doc.target? # 'no recent puzzle was solved'
-      return if doc.target is oldDoc.target # answer changed, not really new
-      console.log 'that was easy', doc, oldDoc
-      return if 'true' is reactiveLocalStorage.getItem 'mute'
-
-Meteor.startup ->
   # see if we've got native emoji support, and add the 'has-emojis' class
   # if so; inspired by
   # https://stackoverflow.com/questions/27688046/css-reference-to-phones-emoji-font
