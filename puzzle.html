@@ -1,6 +1,14 @@
 <template name="puzzle_info">
 <div>
-  <h5><a href="{{puzzle.link}}" target="_blank" style="text-decoration: underline;">{{puzzle.name}}</a></h5>
+  <h5>
+    {{#if hasLink}}
+      <a href="{{puzzle.link}}" target="_blank" style="text-decoration: underline;">{{puzzle.name}}</a>
+      <button class="btn btn-link bb-set-link-button" title="Edit link"><i class="fas fa-pencil-alt"></i></button>
+    {{else}}
+      {{puzzle.name}}<br>
+      <button class="btn btn-inverse bb-set-link-button" title="Edit link">Set Puzzle Link</button>
+    {{/if}}
+  </h5>
   {{#with puzzle}}
   {{#if solved}}
     <b>SOLVED! Answer: {{tag "answer"}}{{#if tag "backsolved"}} (backsolved){{/if}}</b>

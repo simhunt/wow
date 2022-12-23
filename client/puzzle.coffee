@@ -57,6 +57,19 @@ Template.puzzle_info.helpers
         {name: tag.name, value: tag.value, meta: meta.name}
     [].concat r...
 
+  hasLink: ->
+    @puzzle? and @puzzle.link? and @puzzle.link.length > 0
+
+Template.puzzle_info.events
+  "click .bb-set-link-button": (event, template) ->
+    alertify.prompt "Puzzle link:", (e,str) =>
+      return unless e # bail if cancelled
+      n = model.Names.findOne(@puzzle._id)
+      Meteor.call 'setField',
+        type: n.type
+        object: @puzzle._id
+        fields: link: str
+
 Template.puzzle.helpers
   data: ->
     r = {}
