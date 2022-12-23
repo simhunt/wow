@@ -7,7 +7,7 @@ room_name = 'oplog/0'
 Template.oplog.helpers
   oplogs: ->
     model.Messages.find {room_name},
-      sort: [['timestamp','asc']]
+      sort: [['timestamp','desc']]
   prettyType: ->
     model.pretty_collection(this.type)
   # The dawn of time message has ID equal to the room name because it's
