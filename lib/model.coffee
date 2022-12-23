@@ -92,6 +92,7 @@ if Meteor.isServer
 #              only you.
 #   mechanics: list of canonical forms of mechanic names from
 #              ./imports/mechanics.coffee.
+#   whiteboard: contents of the associated whiteboard
 #   puzzles: array of puzzle _ids for puzzles that feed into this.
 #            absent if this isn't a meta. empty if it is, but nothing feeds into
 #            it yet.

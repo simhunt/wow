@@ -484,6 +484,7 @@ tagHelper = ->
   ) for canon in Object.keys(tags).sort() when not \
     ((Session.equals('currentPage', 'blackboard') and \
       (canon is 'status' or \
+          canon is 'whiteboard' or \
           (!isRound and canon is 'answer'))) or \
       ((canon is 'answer' or canon is 'backsolve') and \
       (Session.equals('currentPage', 'puzzle'))))

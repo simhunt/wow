@@ -233,7 +233,7 @@ processBlackboardEdit =
     n = model.Names.findOne(id)
     t = model.collection(n.type).findOne(id).tags[canon]
     # special case for 'status' tag, which might not previously exist
-    for special in ['Status', 'Answer']
+    for special in ['Status', 'Answer', 'Whiteboard']
       if (not t) and canon is model.canonical(special)
         t =
           name: special
