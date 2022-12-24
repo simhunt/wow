@@ -29,6 +29,32 @@ currentViewIs = (puzzle, view) ->
   return false if possible.includes Session.get 'view'
   return view is possible[0]
 
+updatePuzzleTimer = () ->
+  start = Session.get 'puzzleTimerStart'
+  totalTimeInSec = Math.round ((Date.now() - start) / 1000.0)
+  hrsPassed = Math.floor (totalTimeInSec / (60 * 60))
+  minPassed = Math.floor ((totalTimeInSec %% (60 * 60)) / 60)
+  secPassed = totalTimeInSec %% 60
+  hrsPassedString = hrsPassed.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false})
+  minPassedString = minPassed.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false})
+  secPassedString = secPassed.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false})
+  Session.set 'puzzleTimer', (hrsPassedString + ":" + minPassedString + ":" + secPassedString)
+
+pausePuzzleTimer = () ->
+  # Don't do anything if the timer is already paused.
+  return if Session.get 'puzzleTimerPaused' ? true
+
+  if (Session.get 'puzzleTimerIntervalHandle')?
+    Meteor.clearInterval (Session.get 'puzzleTimerIntervalHandle')
+
+  Session.set 'puzzleTimerPaused', true
+  Session.set 'puzzleTimerPauseTime', Date.now()
+
+startPuzzleTimer = () ->
+  intervalHandle = Meteor.setInterval updatePuzzleTimer, 1000
+  Session.set 'puzzleTimerIntervalHandle', intervalHandle
+  updatePuzzleTimer()
+
 Template.puzzle_info.helpers
   tag: (name) -> (model.getTag this, name) or ''
   getPuzzle: -> model.Puzzles.findOne this
@@ -56,6 +82,35 @@ Template.puzzle_info.helpers
         continue unless /^meta /i.test tag.name
         {name: tag.name, value: tag.value, meta: meta.name}
     [].concat r...
+
+  timer: ->
+    unless (Session.get 'puzzleTimerInitAlready')?
+      Session.set 'puzzleTimerInitAlready', true
+      Session.set 'puzzleTimerStart', Date.now()
+      startPuzzleTimer()
+      Session.set 'puzzleTimerPaused', false
+    Session.get 'puzzleTimer'
+
+  timerPaused: ->
+    Session.get 'puzzleTimerPaused' ? false
+
+Template.puzzle_info.events
+  'click .bb-reset-timer-button': (event, template) ->
+    Session.set 'puzzleTimerStart', Date.now()
+    Session.set 'puzzleTimerPauseTime', Date.now()
+    pausePuzzleTimer()
+    updatePuzzleTimer()
+  'click .bb-pause-start-timer-button': (event, template) ->
+    isPaused = Session.get 'puzzleTimerPaused' ? false
+    if isPaused
+      # Update timer start with the elapsed time since pausing.
+      Session.set 'puzzleTimerStart', ((Session.get 'puzzleTimerStart') + Date.now() - (Session.get 'puzzleTimerPauseTime'))
+      startPuzzleTimer()
+    else
+      pausePuzzleTimer()
+    Session.set 'puzzleTimerPaused', not isPaused
+
+
 
 Template.puzzle.helpers
   data: ->
@@ -144,7 +199,7 @@ Template.puzzle_summon_modal.events
     template.$('.modal').modal 'hide'
 
 Template.puzzle.events
-  "click .gCanEdit.bb-editable": (event, template) ->
+  'click .gCanEdit.bb-editable': (event, template) ->
     # note that we rely on 'blur' on old field (which triggers ok or cancel)
     # happening before 'click' on new field
     Session.set 'editing', share.find_bbedit(event).join('/')
@@ -156,7 +211,7 @@ Template.puzzle.events
     # strip leading/trailing whitespace from text (cancel if text is empty)
     text = hexToCssColor event.currentTarget.value.replace /^\s+|\s+$/, ''
     processBlackboardEdit[type]?(text, id, rest...) if text
-  "click .bb-delete-icon": (event, template) ->
+  'click .bb-delete-icon': (event, template) ->
     event.stopPropagation() # keep .bb-editable from being processed!
     [type, id, rest...] = share.find_bbedit(event)
     message = "Are you sure you want to delete "
