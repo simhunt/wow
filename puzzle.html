@@ -126,6 +126,16 @@
   {{/with}}{{/each}}
 </tbody></table>
 {{/let}}{{/if}}
+<table cellpadding="4px" style="margin-top: 20px; margin-left: 5px;"><tbody>
+    <tr>
+      <td>Timer: </td>
+      <td><!-- just spacing --></td>
+      <td style="border: 1px solid;"><b>{{timer}}</b></td>
+      <td><!-- just spacing --></td>
+      <td><button class="btn btn-small btn-inverse bb-reset-timer-button">Reset</button></td>
+      <td><button class="btn btn-small btn-inverse bb-pause-start-timer-button">{{#if timerPaused}}Start{{else}}Pause{{/if}}</button></td>
+    </tr>
+</tbody></table>
 </template>
 
 <template name="puzzle">
@@ -210,6 +220,7 @@
 <button class="btn btn-primary" disabled>Must be logged in</button>
 {{/if}}
 </template>
+
 <template name="puzzle_summon_modal">
 <div class="modal hide fade" id="summon_modal">
   <div class="modal-header">
