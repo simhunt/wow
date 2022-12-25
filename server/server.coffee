@@ -21,6 +21,7 @@ puzzleQuery = (query) ->
       doc: 1
       "favorites.#{@userId}": 1
       mechanics: 1
+      whiteboard: 1
       puzzles: 1
       feedsInto: 1
 

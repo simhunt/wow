@@ -83,6 +83,9 @@ Template.puzzle_info.helpers
         {name: tag.name, value: tag.value, meta: meta.name}
     [].concat r...
 
+  hasLink: ->
+    @puzzle? and @puzzle.link? and @puzzle.link.length > 0
+
   timer: ->
     unless (Session.get 'puzzleTimerInitAlready')?
       Session.set 'puzzleTimerInitAlready', true
@@ -109,8 +112,14 @@ Template.puzzle_info.events
     else
       pausePuzzleTimer()
     Session.set 'puzzleTimerPaused', not isPaused
-
-
+  "click .bb-set-link-button": (event, template) ->
+    alertify.prompt "Puzzle link:", (e,str) =>
+      return unless e # bail if cancelled
+      n = model.Names.findOne(@puzzle._id)
+      Meteor.call 'setField',
+        type: n.type
+        object: @puzzle._id
+        fields: link: str
 
 Template.puzzle.helpers
   data: ->
@@ -275,7 +284,7 @@ processBlackboardEdit =
     n = model.Names.findOne(id)
     t = model.collection(n.type).findOne(id).tags[canon]
     # special case for 'status' tag, which might not previously exist
-    for special in ['Status', 'Answer']
+    for special in ['Status', 'Answer', 'Whiteboard']
       if (not t) and canon is model.canonical(special)
         t =
           name: special

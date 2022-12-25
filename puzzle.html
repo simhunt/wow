@@ -1,6 +1,14 @@
 <template name="puzzle_info">
 <div>
-  <h5><a href="{{puzzle.link}}" target="_blank" style="text-decoration: underline;">{{puzzle.name}}</a></h5>
+  <h5>
+    {{#if hasLink}}
+      <a href="{{puzzle.link}}" target="_blank" style="text-decoration: underline;">{{puzzle.name}}</a>
+      <button class="btn btn-link bb-set-link-button" title="Edit link"><i class="fas fa-pencil-alt"></i></button>
+    {{else}}
+      {{puzzle.name}}<br>
+      <button class="btn btn-inverse bb-set-link-button" title="Edit link">Set Puzzle Link</button>
+    {{/if}}
+  </h5>
   {{#with puzzle}}
   {{#if solved}}
     <b>SOLVED! Answer: {{tag "answer"}}{{#if tag "backsolved"}} (backsolved){{/if}}</b>
@@ -17,7 +25,7 @@
     <tr><td class="wronganswer">IncorrectAnswer:</td><td class="answer">{{answer}}</td></tr>
     <tr><td class="backsolve">{{#if backsolve}}(backsolved){{/if}}</td><td class="timestamp">{{pretty_ts timestamp}}</td></tr>
   {{/each}}
-  <tr><td>Solution:</td>
+  <tr><td><b>Solution:</b></td>
       <td class="puzzle-answer gCanEdit bb-editable edit-puzzle-field"
         data-bbedit="tags/{{_id}}/answer/value">
       {{#if editing "tags" _id "answer" "value"}}
@@ -33,7 +41,7 @@
       {{/if}}
     </td></tr>
 
-  <tr><td>Status:</td>
+  <tr><td><b>Status:</b></td>
       <td class="puzzle-status gCanEdit bb-editable edit-puzzle-field"
         data-bbedit="tags/{{_id}}/status/value">
       {{#if editing "tags" _id "status" "value"}}
@@ -48,7 +56,7 @@
         {{tag "status"}}
       {{/if}}
     </td></tr>
-  <tr><td>Mechanics:</td><td>{{> puzzle_mechanics}}</td></tr>
+  <tr><td><b>Mechanics:</b></td><td>{{> puzzle_mechanics}}</td></tr>
 {{/with}}
 {{#each cares in unsetcaredabout}}
   <tr><td>{{cares.name}}:</td><td class="wanted">(wanted by {{cares.meta}})</td></tr>
@@ -60,9 +68,10 @@
   {{#each tags}}
     {{#if equal name "Status"}}
     {{else if equal name "Stuckness"}}
+    {{else if equal name "Whiteboard"}}
     {{else}}
       <tr>
-        <td class="tagname">{{name}}:</td>
+        <td class="tagname"><b>{{name}}:</b></td>
         <!-- <td class="tagvalue">
           {{#if equal canon "color"}}<span class="bb-colorbox" style="background-color: {{value}}"></span>{{/if}}
           {{value}}
@@ -86,6 +95,22 @@
   {{/each}}
 {{/with}}
 </tbody></table>
+{{#with puzzle}}
+<table class="bb-whiteboard-container"><tbody>
+<tr><td style="text-align: left;"><b>Whiteboard:</b> What's happened? What's unused? Any open questions?</td></tr>
+<tr><td class="puzzle-whiteboard gCanEdit bb-editable edit-puzzle-field bb-whiteboard" data-bbedit="tags/{{_id}}/whiteboard/value">
+  {{#if editing "tags" _id "whiteboard" "value"}}
+    <input type="text" id="tags-{{_id}}-whiteboard-value"
+           value="{{tag "whiteboard"}}"
+           class="input-block-level" />
+  {{else}}
+      <i class="bb-delete-icon fas fa-times pull-right"
+         title="Delete the whiteboard message for this puzzle"></i>
+      {{tag "whiteboard"}}
+  {{/if}}
+</td></tr>
+</tbody></table>
+{{/with}}
 {{> starred_messages canModify=mynick}}
 {{#if puzzle.puzzles}}{{#let cares=caresabout}}
 <table class="bb-round-answers table table-bordered table-condensed"><tbody>

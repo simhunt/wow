@@ -36,6 +36,7 @@ Template.registerHelper 'canEdit', () ->
 Template.registerHelper 'editing', (args..., options) ->
   return false unless Meteor.userId()
   return Session.equals 'editing', args.join('/')
+Template.registerHelper 'celebrationNeeded', () -> Session.get 'celebrationNeeded'
 
 Template.registerHelper 'linkify', (contents) ->
   contents = chat.convertURLsToLinksAndImages(UI._escape(contents))
@@ -188,6 +189,27 @@ Meteor.startup ->
     return
   Session.set 'notifications', Notification.permission
   setupNotifications() if Notification.permission is 'granted'
+
+# For the celebration!
+Meteor.startup ->
+  # idk what this below comment means but it was copied from blackboard.coffee
+  # -----------------------------
+  # note that this observe 'leaks' -- we're not setting it up/tearing it
+  # down with the blackboard page, we're going to play the sound whatever
+  # page the user is currently on.  This is "fun".  Trust us...
+  Meteor.subscribe 'last-answered-puzzle'
+  #celebrationAudio = new Audio('/sound/that_was_easy.wav')
+  # ignore added; that's just the startup state.  Watch 'changed'
+  model.LastAnswer.find({}).observe
+    changed: (doc, oldDoc) ->
+      return unless doc.target? # 'no recent puzzle was solved'
+      return if doc.target is oldDoc.target # answer changed, not really new
+      console.log 'that was easy', doc, oldDoc
+      #unless 'true' is reactiveLocalStorage.getItem 'mute'
+        #celebrationAudio.play()
+      Session.set 'celebrationNeeded', true
+      Meteor.setTimeout (() -> (Session.set 'celebrationNeeded', false)), 3000
+
 
 distToTop = (x) -> Math.abs(x.getBoundingClientRect().top - 110)
 
