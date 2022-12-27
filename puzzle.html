@@ -8,13 +8,16 @@
       {{puzzle.name}}<br>
       <button class="btn btn-inverse bb-set-link-button" title="Edit link">Set Puzzle Link</button>
     {{/if}}
+    {{> puzzle_add_tag}}
   </h5>
   {{#with puzzle}}
   {{#if solved}}
-    <b>SOLVED! Answer: {{tag "answer"}}{{#if tag "backsolved"}} (backsolved){{/if}}</b>
+    <b>SOLVED! Answer: {{tag "answer"}}{{#if backsolved}} (backsolved){{/if}}</b>
+  <!--
+     Disable this since it doesn't seem to do much anymore.
   {{else}}
-  {{> puzzle_summon_button}}
-  {{> puzzle_add_tag}}
+    {{> puzzle_summon_button}}
+  -->
   {{/if}}
   {{/with}}
 </div>
@@ -42,19 +45,8 @@
     </td></tr>
 
   <tr><td><b>Status:</b></td>
-      <td class="puzzle-status gCanEdit bb-editable edit-puzzle-field"
-        data-bbedit="tags/{{_id}}/status/value">
-      {{#if editing "tags" _id "status" "value"}}
-        <input type="text" id="tags-{{_id}}-status-value"
-                value="{{tag "status"}}"
-                class="input-block-level" />
-      {{else}}
-        {{#if tag "status"}}
-          <i class="bb-delete-icon fas fa-times pull-left"
-              title="Delete the status message for this puzzle"></i>
-        {{/if}}
-        {{tag "status"}}
-      {{/if}}
+      <td class="puzzle-status">
+        {{#statuses}}{{/statuses}}
     </td></tr>
   <tr><td><b>Mechanics:</b></td><td>{{> puzzle_mechanics}}</td></tr>
 {{/with}}
@@ -66,8 +58,7 @@
 {{/each}}
 {{#with puzzle}}
   {{#each tags}}
-    {{#if equal name "Status"}}
-    {{else if equal name "Stuckness"}}
+    {{#if equal name "Stuckness"}}
     {{else if equal name "Whiteboard"}}
     {{else}}
       <tr>
@@ -179,7 +170,7 @@
   {{else}}
   <div class="bb-vsplitter" style="{{#unless currentViewIs "info"}}padding-bottom: {{vsizePlusHandle}}px{{/unless}}">{{! start right of splitter }}
     {{#unless currentViewIs "info"}}
-    <div class="bb-top-right-content {{#if puzzle.solved}}bb-status-solved{{else if stuck}}bb-status-stuck{{/if}}">{{! start top right splitter }}
+    <div class="bb-top-right-content bb-status-{{category puzzle}}">{{! start top right splitter }}
       {{> puzzle_info }}
     </div>
     <div class="bb-splitter-handle" style="bottom: {{vsize}}px"></div>

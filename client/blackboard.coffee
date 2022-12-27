@@ -3,6 +3,7 @@
 import { nickEmail } from './imports/nickEmail.coffee'
 import puzzleColor, { cssColorToHex, hexToCssColor } from './imports/objectColor.coffee'
 import { reactiveLocalStorage } from './imports/storage.coffee'
+import { DisplayedStatus } from '../lib/imports/statuses.coffee'
 
 model = share.model # import
 settings = share.settings # import
@@ -75,6 +76,8 @@ Template.blackboard.helpers
 Template.registerHelper 'hideSolved', -> 'true' is reactiveLocalStorage.getItem 'hideSolved'
 Template.registerHelper 'hideSolvedMeta', -> 'true' is reactiveLocalStorage.getItem 'hideSolvedMeta'
 Template.registerHelper 'hideStatus', -> 'true' is reactiveLocalStorage.getItem 'hideStatus'
+
+Template.registerHelper 'category', (puzzle) -> DisplayedStatus(puzzle.statuses).category
 
 # Notifications
 notificationStreams = [
@@ -183,7 +186,6 @@ Template.blackboard_status_grid.helpers
       puzzle: model.Puzzles.findOne(id) or { _id: id }
     } for id, index in ps)
     return p
-  stuck: share.model.isStuck
 
 Template.blackboard.onRendered ->
   @escListener = (event) =>
@@ -361,7 +363,7 @@ Template.blackboard_unassigned.events
   'click tbody.unassigned tr.puzzle .bb-move-down': moveAfterNext.bind null, 'tr.puzzle', 'after'
 processBlackboardEdit =
   tags: (text, id, canon, field) ->
-    field = 'name' if text is null # special case for delete of status tag
+    field = 'name' if text is null # special case for delete of answer tag
     processBlackboardEdit["tags_#{field}"]?(text, id, canon)
   puzzles: (text, id, field) ->
     processBlackboardEdit["puzzles_#{field}"]?(text, id)
@@ -388,8 +390,8 @@ processBlackboardEdit =
   tags_value: (text, id, canon) ->
     n = model.Names.findOne(id)
     t = model.collection(n.type).findOne(id).tags[canon]
-    # special case for 'status' tag, which might not previously exist
-    for special in ['Status', 'Answer']
+    # special case for 'answer' or 'whiteboard' tag, which might not previously exist
+    for special in ['Answer', 'Whiteboard']
       if (not t) and canon is model.canonical(special)
         t =
           name: special
@@ -483,8 +485,7 @@ tagHelper = ->
     { _id: "#{@_id}/#{canon}", id: @_id, name: t.name, canon, value: t.value }
   ) for canon in Object.keys(tags).sort() when not \
     ((Session.equals('currentPage', 'blackboard') and \
-      (canon is 'status' or \
-          canon is 'whiteboard' or \
+      (canon is 'whiteboard' or \
           (!isRound and canon is 'answer'))) or \
       ((canon is 'answer' or canon is 'backsolve') and \
       (Session.equals('currentPage', 'puzzle'))))

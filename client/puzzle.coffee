@@ -2,6 +2,7 @@
 
 import color from './imports/objectColor.coffee'
 import embeddable from './imports/embeddable.coffee'
+import { backsolvedStatus } from '../lib/imports/statuses.coffee'
 
 model = share.model # import
 settings = share.settings # import
@@ -97,6 +98,8 @@ Template.puzzle_info.helpers
   timerPaused: ->
     Session.get 'puzzleTimerPaused' ? false
 
+  backsolved: -> backsolvedStatus.canon in @statuses
+
 Template.puzzle_info.events
   'click .bb-reset-timer-button': (event, template) ->
     Session.set 'puzzleTimerStart', Date.now()
@@ -156,7 +159,7 @@ Template.puzzle.onCreated ->
     @subscribe 'round-for-puzzle', id
     @subscribe 'puzzles-by-meta', id
 
-# Make sure that the answer / status boxes automatically get focus when we click
+# Make sure that the answer / whiteboard boxes automatically get focus when we click
 Template.puzzle.onRendered ->
   this.autorun => 
     editing = Session.get 'editing'
@@ -256,7 +259,7 @@ okCancelEvents = share.okCancelEvents = (selector, callbacks) ->
 
 processBlackboardEdit =
   tags: (text, id, canon, field) ->
-    field = 'name' if text is null # special case for delete of status tag
+    field = 'name' if text is null # special case for delete of answer tag
     processBlackboardEdit["tags_#{field}"]?(text, id, canon)
   puzzles: (text, id, field) ->
     processBlackboardEdit["puzzles_#{field}"]?(text, id)
@@ -283,8 +286,8 @@ processBlackboardEdit =
   tags_value: (text, id, canon) ->
     n = model.Names.findOne(id)
     t = model.collection(n.type).findOne(id).tags[canon]
-    # special case for 'status' tag, which might not previously exist
-    for special in ['Status', 'Answer', 'Whiteboard']
+    # special case for 'answer' or 'whiteboard' tag, which might not previously exist
+    for special in ['Answer', 'Whiteboard']
       if (not t) and canon is model.canonical(special)
         t =
           name: special
