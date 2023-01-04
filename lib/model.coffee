@@ -2,6 +2,7 @@
 
 import canonical from './imports/canonical.coffee'
 import { ArrayMembers, ArrayWithLength, NumberInRange, NonEmptyString, IdOrObject, ObjectWith } from './imports/match.coffee'
+import { IsStatus, solvedStatus, backsolvedStatus } from './imports/statuses.coffee'
 import { IsMechanic } from './imports/mechanics.coffee'
 import { getTag, isStuck, canonicalTags } from './imports/tags.coffee'
 import { RoundUrlPrefix, PuzzleUrlPrefix } from './imports/settings.coffee'
@@ -85,11 +86,13 @@ if Meteor.isServer
 #   solved_by:  timestamp of Nick who confirmed the answer
 #   incorrectAnswers: [ { answer: "Wrong", who: "answer submitter",
 #                         backsolve: ..., provided: ..., timestamp: ... }, ... ]
-#   tags: status: { name: "Status", value: "stuck" }, ... 
+#   tags: whiteboard: { name: "whiteboard", value: "This is a fun puzzle!" }, ... 
 #   spreadsheet: optional google spreadsheet id
 #   favorites: object whose keys are userids of users who favorited this
 #              puzzle. Values are true. On the client, either empty or contains
 #              only you.
+#   statuses: list of canonical forms of status names from
+#             ./imports/statuses.coffee.
 #   mechanics: list of canonical forms of mechanic names from
 #              ./imports/mechanics.coffee.
 #   whiteboard: contents of the associated whiteboard
@@ -338,6 +341,28 @@ spread_id_to_link = (id) ->
     updateDoc.$unset ?= {}
     updateDoc.$unset["tags.#{canonical(name)}"] = ''
     true
+
+  addStatusInternal = (userId, puzzle, status) ->
+    check userId, NonEmptyString
+    check puzzle, NonEmptyString
+    check status, IsStatus
+    num = Puzzles.update puzzle,
+      $addToSet: statuses: status
+      $set:
+        touched: UTCNow()
+        touched_by: userId
+    throw new Meteor.Error(404, "bad puzzle") unless num > 0
+
+  removeStatusInternal = (userId, puzzle, status) ->
+    check userId, NonEmptyString
+    check puzzle, NonEmptyString
+    check status, IsStatus
+    num = Puzzles.update puzzle,
+      $pull: statuses: status
+      $set:
+        touched: UTCNow()
+        touched_by: userId
+    throw new Meteor.Error(404, "bad puzzle") unless num > 0
 
   newSheet = (id, name) ->
     check id, NonEmptyString
@@ -918,7 +943,7 @@ spread_id_to_link = (id) ->
         value: args.answer
         who: @userId
         now: now
-      deleteTagInternal updateDoc, 'status'
+      addStatusInternal @userId, id, solvedStatus.canon
       if args.backsolve
         setTagInternal updateDoc,
           name: 'Backsolve'
@@ -982,6 +1007,8 @@ spread_id_to_link = (id) ->
       deleteTagInternal updateDoc, 'answer'
       deleteTagInternal updateDoc, 'backsolve'
       deleteTagInternal updateDoc, 'provided'
+      removeStatusInternal @userId, id, solvedStatus.canon
+      removeStatusInternal @userId, id, backsolvedStatus.canon
       Puzzles.update id, updateDoc
       puzzle = Puzzles.findOne(id)
       share.discordBot.newVoiceChannel((Meteor.call 'getRoundForPuzzle', id).name, puzzle.name)
@@ -1001,6 +1028,12 @@ spread_id_to_link = (id) ->
       num = Puzzles.update puzzle, $unset:
         "favorites.#{@userId}": ''
       num > 0
+
+    addStatus: (puzzle, status) ->
+      addStatusInternal @userId, puzzle, status
+
+    removeStatus: (puzzle, status) ->
+      removeStatusInternal @userId, puzzle, status
 
     addMechanic: (puzzle, mechanic) ->
       check @userId, NonEmptyString

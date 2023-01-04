@@ -157,11 +157,13 @@ body.has-emojis {
     float: right; margin-top: 4px; margin-right: 3px;
   }
   .bb-left-content, .bb-top-right-content {
-    &.bb-status-stuck { background: #ffd333; }
+    &.bb-status-stuck { background: var(--color-bg-stuck); }
+    &.bb-status-attention { background: var(--color-bg-attention); }
     &.bb-status-solved { background: var(--color-bg-solved); }
     .boring & {
       background: inherit;
-      .bb-status-stuck { background: #ffd333; }
+      .bb-status-stuck { background: var(--color-bg-stuck); }
+      .bb-status-attention { background: var(--color-bg-attention); }
       .bb-status-solved { background: var(--color-bg-solved); }
     }
     .bb-mechanics-dropdown .btn {
@@ -290,7 +292,11 @@ body.has-emojis {
       background: var(--color-bg-solved);
     }
     .bb-status-stuck {
-      background:#ffd333;
+      background: var(--color-bg-stuck);
+      color: var(--color-h1);
+    }
+    .bb-status-attention {
+      background: var(--color-bg-attention);
       color: var(--color-h1);
     }
     .bb-status-unsolved {
@@ -433,7 +439,10 @@ body.has-emojis {
     }
   }
   tr.bb-status-stuck td {
-    background-color: #ffd333;
+    background-color: var(--color-bg-stuck);
+  }
+  tr.bb-status-attention td {
+    background-color: var(--color-bg-attention);
   }
   tr.bb-status-solved td {
     padding-left: 6px;
@@ -753,6 +762,8 @@ body {
 
   /* Special backgrounds / highlighting */
   --color-bg-solved: #bcffa6;
+  --color-bg-stuck: #ffc4a6;
+  --color-bg-attention: #fff0a6;
   --color-bg-mymessage: #e8edff;
 
   /* Borders */
@@ -794,6 +805,8 @@ body.dark-theme {
 
   /* Special backgrounds / highlighting */
   --color-bg-solved: #344739;
+  --color-bg-stuck: #473434;
+  --color-bg-attention: #474734;
   --color-bg-mymessage: #0784b5;
 
   /* Borders */

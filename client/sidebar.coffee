@@ -53,20 +53,6 @@ whiteboardSubmit = (content) ->
 
 # --- Puzzles for You ---
 allhands_tag = 'all hands (swarm)'
-  
-# Needed to show tags for mechanics. Copied from blackboard.coffee.
-tagHelper = ->
-  isRound = not ('feedsInto' of this)
-  tags = this?.tags or {}
-  (
-    t = tags[canon]
-    { _id: "#{@_id}/#{canon}", id: @_id, name: t.name, canon, value: t.value }
-  ) for canon in Object.keys(tags).sort() when not \
-    ((Session.equals('currentPage', 'blackboard') and \
-      (canon is 'status' or \
-          (!isRound and canon is 'answer'))) or \
-      ((canon is 'answer' or canon is 'backsolve') and \
-      (Session.equals('currentPage', 'puzzle'))))
 
 # Given a map and key, returns map[key] if it is defined and 0 otherwise.
 getDefaultZero = (map, key) ->
@@ -236,10 +222,6 @@ Template.whiteboard_textbox.onRendered ->
 
 
 # -- Puzzle-suggestion-specific template functions --
-
-# Individual puzzles in the bulletin have to know their tags.
-Template.bulletin_puzzle.helpers
-    tags: tagHelper
 
 # Manage clicks on the 'later' buttons.
 Template.bulletin_puzzle.events

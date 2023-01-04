@@ -1,0 +1,18 @@
+<template name="statuses">
+  {{! expected data context: puzzle }}
+  <div class="btn-group bb-statuses-dropdown" title="{{displayedExplanation}}">
+    <a class="btn dropdown-toggle pull-left {{displayedBtnType}} btn-small" data-toggle="dropdown" href="#">
+      {{displayedStatus}}
+      <span class="caret"></span>
+    </a>
+    <ul class="dropdown-menu">
+      {{#each statusesList}}
+      <li><a name="{{canon}}" title="{{explanation}}">
+        <label class="checkbox">
+          <input data-status="{{canon}}" type="checkbox" checked="{{isChecked}}">{{name}}
+        </label>
+      </a></li>
+      {{/each}}
+    </ul>
+  </div>
+</template>

@@ -172,15 +172,15 @@
     <table>
     <tbody>
       {{#each rounds}}
-      <tr><th colspan=2 class="bb-status-grid-round bb-status-{{#if solved}}solved{{else if stuck this}}stuck{{else}}unsolved{{/if}}">{{name}}</th></tr>
+      <tr><th colspan=2 class="bb-status-grid-round bb-status-{{category puzzle}}">{{name}}</th></tr>
         {{#each metas}}
         <tr>
-          <td class="bb-status-grid-meta bb-status-{{#if puzzle.solved}}solved{{else if stuck puzzle}}stuck{{else}}unsolved{{/if}}">
+          <td class="bb-status-grid-meta bb-status-{{category puzzle}}">
             <a href="#meta-anchor{{puzzle._id}}">{{puzzle.name}}</a>
           </td>
           <td class="bb-status-grid-puzzles">
             {{#each puzzles puzzle.puzzles}}
-            <div class="bb-status-grid-cell bb-status-{{#if puzzle.solved}}solved{{else if stuck puzzle}}stuck{{else}}unsolved{{/if}}">
+            <div class="bb-status-grid-cell bb-status-{{category puzzle}}">
               <a href="#puzzle-anchor{{puzzle._id}}" title="{{puzzle.name}}">{{puzzle_num}}</a>
             </div>
             {{/each}}
@@ -193,7 +193,7 @@
             <td class="bb-status-grid-meta bb-status-unsolved"><a href="#unassigned-anchor{{../_id}}">Unassigned</a></td>
             <td class="bb-status-grid-puzzles">
               {{#each puzzles this}}
-              <div class="bb-status-grid-cell bb-status-{{#if puzzle.solved}}solved{{else if stuck puzzle}}stuck{{else}}unsolved{{/if}}">
+              <div class="bb-status-grid-cell bb-status-{{category puzzle}}">
                 <a href="#puzzle-anchor{{puzzle._id}}" title="{{puzzle.name}}">{{puzzle_num}}</a>
               </div>
               {{/each}}
@@ -356,23 +356,8 @@
       {{/if}}
     </td>
     {{#unless compactMode}}
-      <td class="puzzle-status gCanEdit {{#unless puzzle.solved}}bb-editable{{/unless}}"
-          data-bbedit="tags/{{puzzle._id}}/status/value">
-        {{#if editing "tags" puzzle._id "status" "value"}}
-          <input type="text" id="tags-{{puzzle._id}}-status-value"
-                  value="{{tag "status"}}"
-                  class="input-block-level" />
-        {{else}}
-          {{#unless puzzle.solved}}
-            {{#if tag "status"}}
-              <i class="bb-delete-icon fas fa-times pull-left"
-                  title="Delete the status message for this puzzle"></i>
-            {{/if}}
-            {{tag "status"}}
-          {{else}}
-          solved!
-          {{/unless}}
-        {{/if}}
+      <td class="puzzle-status">
+        {{#statuses puzzle}}{{/statuses}}
       </td>
       {{#unless canEdit}}
         <td class="puzzle-working">
@@ -410,7 +395,7 @@
           <td style="background: {{color}}; border-top-left-radius: 100%; border-right:0;"></td>
           <td colspan="100" style="background: {{color}}; border-left:0;"></td>
       </tr>
-      <tr class="meta {{#if stuck puzzle}}bb-status-stuck{{else if puzzle.solved}}bb-status-solved{{/if}}">
+      <tr class="meta bb-status-{{category puzzle}}">
         {{> blackboard_puzzle_cells puzzle=puzzle sidebarColor=color }}
       </tr>
       {{#each puzzles}}
@@ -445,7 +430,7 @@
   
   <template name="blackboard_puzzle">
     <a name="puzzle-anchor{{puzzle._id}}" class="bb-anchor"></a>
-    <tr class="puzzle {{#if puzzle.solved}}bb-status-solved{{else if stuck puzzle}}bb-status-stuck{{/if}}" draggable="{{canEdit}}" data-puzzle-id="{{puzzle._id}}">
+    <tr class="puzzle bb-status-{{category puzzle}}" draggable="{{canEdit}}" data-puzzle-id="{{puzzle._id}}">
       {{> blackboard_puzzle_cells}}
    </tr>
   </template>
