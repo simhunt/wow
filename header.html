@@ -263,16 +263,21 @@
       </div>
       <div class="control-group" id="nickInputGroup">
         <label class="control-label" for="nickInput">Nick</label>
+        <label class="control-label" for="nickInput">Name</label>
         <div class="controls">
           <div class="input-prepend">
             <span class="add-on">@</span>
             <input type="text" id="nickInput" autocomplete="nickname"
                     inputmode="verbatim" required
-                    placeholder="nick" maxlength=20/>
+                    placeholder="name" maxlength=20/>
           </div>
+          <span class="help-inline">(real name or unique identifier)</span><br/>
           <span class="help-inline">(1-20 characters)</span>
         </div>
       </div>
+      <!--
+      Disable real name selection since we want people to use real names for nicknames anyway.
+      TODO(allenpark): Remove uses of real_name and combine with nickname. Rename nickname to just "name".
       <div class="control-group">
         <label class="control-label" for="nickRealname">Real Name</label>
         <div class="controls">
@@ -282,6 +287,7 @@
           <span class="help-inline">(optional)</span>
         </div>
       </div>
+      -->
       <div class="control-group">
         <div class="controls">
           <input type="hidden" id="nickEmail"/>
