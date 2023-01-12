@@ -501,7 +501,7 @@ Template.header_nickmodal_contents.events
   'submit #nickPick': (event, template) ->
     nick = $("#nickInput").val().replace(/^\s+|\s+$/g,"") #trim
     return false unless nick
-    Meteor.loginWithCodex nick, $('#nickRealname').val(), $('#nickEmail').val(), $('#passwordInput').val(), (err, res) ->
+    Meteor.loginWithCodex nick, "", $('#nickEmail').val(), $('#passwordInput').val(), (err, res) ->
       if err?
         le = $("#loginError")
         if err.reason?
